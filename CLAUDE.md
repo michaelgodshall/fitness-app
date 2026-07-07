@@ -8,9 +8,12 @@ AI-native family training coach: generated bodyweight co-training sessions for p
 3. `docs/legacy/` is the superseded Oct 2025 plan — reference only, never authority.
 
 ## Current status (update this section every session)
-- **Phase 0 — Family Gate** (summer 2026). Foundation locked 2026-07-06 via grill + Codex review.
-- In flight as of 2026-07-06: platform/stack research swarm; monetization research swarm. Platform decision is the next founder decision (ADR in `docs/decisions/`).
-- Nothing built yet. First build target: engine data model + walking skeleton (roadmap sessions 2-4).
+- **Phase 0 — Family Gate** (summer 2026). Foundation locked 2026-07-06 via grill + research swarms + pre-mortem + Codex adversarial review.
+- **ADR-001 RATIFIED:** web-first (one web app = big-screen display + phone controllers via QR/room-code), Convex + Clerk, big-screen-authoritative sync, Expo native deferred to Phase 2. Domain logic must stay in pure-TS packages (reversibility hedge).
+- **Monetization sequenced** (see PLAN §5): free beta → capped paid founding cohort (~$79 founding-year, never "lifetime") → permanent model from own data. Sponsored-family path stays open.
+- **Codex review:** round 1 REVISE (20 findings) — arbitrated in PLAN-REVIEW-LOG.md, plan revised; round 2 was in flight at session end (check scratchpad codex-verdict-r2.txt or re-run; MAX_ROUNDS=5).
+- Design docs complete in `docs/design/` (7 docs: experience, planner spec, trials/challenges, skills, voice, naming, pre-mortem+backlog). Skills doc ends with 7 founder questions; naming needs founder verification sweep (Strongside / HomeTeam / Pact first).
+- Git initialized 2026-07-06 (root commit 9dde436). Nothing built yet. First build target: engine data model + walking skeleton, honoring the week-2 paper-session kill-switch (PLAN §Approach-2).
 
 ## Hard rules
 - **Gates are numeric and don't move** (see roadmap). Missed gate → diagnose and fix, never advance.

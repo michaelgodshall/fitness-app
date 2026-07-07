@@ -51,3 +51,30 @@ VERDICT: REVISE — 20 findings (full text preserved below, condensed):
 **Rejected (logged reasons):**
 - **20 (concierge prototype instead of engine) — rejected as a replacement, accepted as a sequencing principle.** The demand question is already answered for family #1 by 16 months of lived co-training; Phase 0 tests whether the *engine* fixes exhaustion/consistency/teen-drift, which a spreadsheet structurally cannot (the intervention IS generation + adaptivity + feedback moments). Kernel kept: a week-2 "paper session test" kill-switch — planner output run by the family from a plain screen/printout before UI investment; if generated sessions don't excite the family on paper, stop building UI.
 - **14 (partial):** "rolling baselines" rejected for within-family use — beating your all-time best is the honest bar and the emotional product ("beat your best," not "beat your recent average"); rolling baselines return only if Phase 3 league math needs them.
+
+## Round 2 — Codex
+
+VERDICT: REVISE — "substance much stronger than round 1"; prior findings mostly addressed. 8 remaining/new findings:
+
+1. PLAN.md self-contradicts (stale Key Decisions/Risks lines vs. revised Approach)
+2. docs/03-roadmap.md materially stale (4-5 skills, local-first, platform pending, percentile phrasing, store submission)
+3. "No child PII" still overclaimed (persistent identifiers/IPs/logs are personal information under COPPA)
+4. Cutting phone controllers first can break the non-sync gate (slices depend on room-code links)
+5. Paid founding cohort gates Phase 2 but billing phase was ambiguous
+6. The 4-skill cut removed the pull-up on-ramp that muscle-up's entry gate depends on
+7. "Fair by construction" wording survived for improvement scoring
+8. "Qualified" cold signup undefined — gameable
+
+### Claude's response (arbitration)
+
+**All 8 accepted and applied:**
+- **1:** Key Decisions rewritten (competition = fairness *hypothesis* with calibration/caps/floors, league math validated before Phase 3; monetization = sequenced model; platform = ADR-001 ratified). Risks section updated (form-factor research complete-but-hypothesis; stack decided with hedges; monetization sequenced).
+- **2:** Roadmap synced: 5 skill paths, ADR-aligned data posture, percentile thresholds, open-items table updated to resolved/sequenced statuses, next-5-sessions list refreshed (platform session replaced by review-loop closure).
+- **3:** Phase 0 rephrased "data-minimized, founder-family only"; Phase 1 data map explicitly covers IPs, session tokens, server/Convex/hosting logs.
+- **4:** Cut-line fallback defined: with controllers cut, async slices complete on the shared family device — still satisfies the non-sync gate.
+- **5:** Gate 1.5 now includes billing-before-public: private paid founding cohort on Stripe + entitlements table as Phase 1 exit work.
+- **6:** Pull-Up added as the 5th path (converges with the skills-designer's independent argument — the on-ramp younger kids need and muscle-up's entry gate requires); cut order re-pointed at Front Lever first, Pull-Up never.
+- **7:** Wording downgraded to fairness hypothesis (already believed; the text now says what we mean).
+- **8:** Qualified defined: verified email + parent with kids 8-14 + explicit beta interest + stated 3×/week willingness.
+
+No rejections this round — every finding was either a staleness fix or a convergent catch.

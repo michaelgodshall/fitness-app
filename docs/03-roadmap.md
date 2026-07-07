@@ -21,11 +21,11 @@ _Foundation doc v2.0 — July 2026. The arc is milestone-gated, not calendar-gat
 2. Session planner v1 — deterministic; inputs: roster + time available + week's training history; constraints: 45-min cap, movement-pattern balance, progressive density, strategic repeat scheduling
 3. Workout surface — session display + per-member logging + mid-workout difficulty swaps (form factor per platform decision)
 4. PB detection ("beat last Tuesday: 64 squats") + weekly Pact tracking
-5. Skills v0 — 4-5 hand-authored progression paths (muscle-up, HSPU, pistol, front lever); no polish — this is teen-drift instrumentation (must include the "tier unlocked" feedback beat at session close)
+5. Skills v0 — 5 hand-authored progression paths (pull-up [the on-ramp], muscle-up, HSPU, pistol, front lever); no polish — teen-drift instrumentation (must include the "rung unlocked" feedback beat at session close; see docs/design/skill-progressions.md)
 6. Engine eval harness — planner unit tests + a founder review workflow for generated blocks (explicit deliverable, not an afterthought)
 7. Async slice-completion substrate — a member who misses the family session can complete their scaled portion solo (any device/time), banking it to their Pact line. Synchronous sessions stay the flagship; the slice is the school-year pressure valve. (Ratified from pre-mortem — see docs/design/pre-mortem-and-backlog.md)
 
-**Non-goals:** accounts, payments, store submission, Trials, Challenges, coach-voice polish. Dev build on founder devices; local-first storage.
+**Non-goals:** accounts, payments, store submission, Trials, Challenges, coach voice beyond a hand-authored starter set. Web app per ADR-001: anonymous, data-minimized Convex session state (no contact info, founder family only); display device owns in-flight sessions (offline-resilient). Scope cut line and order live in PLAN.md §Approach-1.
 
 **GATE 0→1** (operationalized in full in PLAN.md §Approach-2): 3+ sessions/week × 4+ weeks with **≥2/week synchronous shared** (≥20 min, ≥2 members incl. adult); attendance-friction log ≤20% "pushed"; teen ladder-views ≥1×/week outside sessions + ≥1 self-declared rung test/2 weeks; one deliberately **non-synchronous week** in which the family system still holds. Week-2 kill-switch: planner sessions run from a plain screen before UI investment.
 
@@ -42,7 +42,7 @@ _Foundation doc v2.0 — July 2026. The arc is milestone-gated, not calendar-gat
 ## Phase 2 — Public v1 (winter 2026-27)
 
 - Monetization decision executed (trial-led premium annual-first posture vs. free-first — per research + beta WTP)
-- Asynchronous competition seeds: global Trials percentiles, monthly improvement leaderboards, skill milestones (no liquidity required)
+- Asynchronous competition seeds: skill milestones and improvement boards — own-history and private community cohorts first; percentiles hidden until per-test/cohort N thresholds; low-stakes, family-level, opt-in until verification standards exist
 - **Teen companion access:** 13+, parent-granted, own device; solo sessions feed the family Pact
 - Content marketing engine on (founder-authentic scaling demos; build-in-public)
 
@@ -61,20 +61,22 @@ Wearables/health integrations · computer-vision form feedback · nutrition · s
 
 ## Open items & how they resolve
 
-| Item | Resolution path | Due |
+| Item | Resolution path | Status / due |
 |---|---|---|
-| Platform/stack (big-screen hypothesis, Expo vs web+mobile, Convex vs alternatives, Clerk/WorkOS) | Research swarm (in flight) → founder decision | Before Phase 0 build |
-| Monetization model | Research swarm (in flight) + beta WTP | Phase 2 boundary |
-| Product name/brand | Naming sprint | Before Phase 1 recruitment |
-| COPPA implementation detail | Compliance design task | Phase 1 build |
-| Incumbent recon | Structured check of Apple/Peloton/Nike/Fitbit family features | Phase 1 |
+| Platform/stack | **RESOLVED** — ADR-001 ratified 2026-07-06 (web-first, Convex, Clerk) | Done |
+| Monetization model | **SEQUENCED** — free beta → paid founding cohort → permanent choice from own data (PLAN §5) | Final call at Phase 2 boundary |
+| Codex review loop | Round 2 arbitrated; continue to APPROVED or MAX_ROUNDS=5 (PLAN-REVIEW-LOG.md) | Next session |
+| Product name/brand | Shortlist done (docs/design/naming.md) → founder verification sweep (Strongside/HomeTeam/Pact) | Before Phase 1 recruitment |
+| COPPA compliance gate | Data map (incl. IPs/tokens/logs), DPAs, review/delete flows, counsel or safe-harbor review | Phase 1, before recruiting minors |
+| Incumbent recon + substitute map | Apple/Peloton/Nike/Fitbit family features + YouTube/manual/AI-generator substitutes | Phase 1 |
+| Skills founder questions (7) | docs/design/skill-progressions.md §Open questions — needs founder's lived data | Before library authoring |
 
 ## Next 5 working sessions (concrete)
 
-1. **Platform decision session** — read the platform research brief, decide stack + form factor, record an ADR in `docs/decisions/`.
-2. **Engine design session** — data model for exercises/blocks/sessions/members; planner constraint spec; eval harness design. (This is the deepest design work in Phase 0 — bring judgment.)
-3. **Library authoring session #1** — seed ~40-60 exercises with swap chains from the legacy library concept; set up the LLM batch-authoring + founder-review workflow.
-4. **Build session(s)** — scaffold app + backend; workout surface walking skeleton (generate → display → log → save).
-5. **Family session zero** — first real workout on the walking skeleton; capture friction notes; iterate.
+1. **Close the review loop** — check Codex round 3 verdict, arbitrate remaining findings, commit; answer the 7 skills founder questions; start the naming verification sweep.
+2. **Repo scaffold + engine data model** — monorepo (pure-TS domain packages per ADR-001), exercise/block/session/member schema from the planner spec.
+3. **Library authoring session #1** — seed ~40-60 exercises with swap chains; stand up the LLM batch-authoring + founder-review workflow + simulation-harness triage.
+4. **Paper-session test (week-2 kill-switch)** — planner generates real sessions; family runs them from a plain screen; excitement is the metric.
+5. **Walking skeleton + family session zero** — big-screen surface (generate → display → log → save); first real workout; friction notes drive the next iteration.
 
 _A missed week costs nothing but time — the gates don't move, the fences don't move, and the docs remember everything._
