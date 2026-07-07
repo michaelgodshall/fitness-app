@@ -249,3 +249,176 @@ The founder already owns, from earlier project work: **squadstrong.com**, **squa
 **Kinforge** — coined compound (Strategy E). Strengths: the most *ownable* name on the entire board (coined = clean trademark lane, total search ownability); the forge metaphor is deeply on-mission — strength forged through shared struggle is literally the brand story, and it hands the coach voice a gift ("forged, not given"); "kin" resonates with the family-values wedge communities. Risks: "kin" is precious/archaic to a teen ear — nobody 14 says kin; a mild fantasy-guild ring (test whether that's a bug or a feature with the boys); ideally wants kinforge.com, status UNVERIFIED (founder owns kinforgefit.com). Rough score: **~16/20**.
 
 **Ruling for the verification sweep:** neither displaces Strongside/HomeTeam on pure brand quality, but ownership is worth real points at this stage — **add both to the dinner-table test alongside Strongside, HomeTeam, and Pact.** Five names, one evening, the 14-year-old's face ranks them. If Strongside/HomeTeam hit domain walls (parked, five-figure asks), SquadStrong and Kinforge become the pragmatic front-runners at zero acquisition cost. Either way, keep the unused domains — squadstrong.fit makes a fine beta-waitlist or league-landing URL even under another brand.
+
+---
+
+## Round 2 — founder-taste-directed (2026-07-07)
+
+_Round 2 optimizes for the founder's taste profile (below), received after the round-1 slate and the owned-domains addendum. Scoring uses the §2 criteria unchanged, calibrated against round-1 anchors (Strongside 19, Stronghouse 17, Ironkin 13) so totals stay comparable across rounds. The availability disclaimer at the top of this doc applies to everything below — every collision note is REPORTED/UNVERIFIED._
+
+### R2.1 The taste profile (why this round is different)
+
+- **Compounds only.** Two-word/compound names; standalone single words read generic and hard to brand. Pact, Forge, Foundry, Crucible are out as brands — but in as *components*. (The Weekly Pact mechanic keeps its name regardless.)
+- **The register exemplars are SquadStrong and Kinforge** (domains owned): {family/team word} × {strength/forge/metallurgy word}. From round 1 he likes Strongside, IronPact, and Forge/Foundry as components.
+- **The HomeTeam lesson.** HomeTeam and Homefield read too generic to him — flat familiar-phrase compounds are dead on arrival; names need an edge. This retroactively re-ranks the round-1 slate (scores stand; the combined slate in R2.6 applies the filter).
+- **The Crucible exception.** The one single word he loves — partly via Destiny/Destiny 2, where the Crucible is the competitive arena and Trials of Osiris its pinnacle event; this product also runs monthly Trials. Explored two ways: as compound components (R2.2) and as an in-product event name (ruling in R2.5).
+- **The iron tension.** Drawn to iron names, but iron connotes barbells and v1 is bodyweight-pure. Not a lane-kill — assessed per name in R2.3's iron note.
+
+### R2.2 Round-2 longlist — lanes, survivors, kills
+
+Lanes worked: {kin, squad, crew, house, side, blood?, folk?} × {strong, forge, foundry, iron, steel, grit, crucible, tempered}; metallurgy/forging metaphors (tempering, anvils, casting, smithing); plus wildcards honoring the edge-not-generic rule. Numbering continues from §2.
+
+**Survivors (scored in R2.3):**
+
+30. **Ironside** — iron + side: Strongside's harder twin. Not an invented compound but an earned Anglo-Saxon epithet — Edmund Ironside, the English king named for toughness in battle; "Old Ironsides," the warship whose hull shrugged off cannonballs (both REPORTED). Iron as what you're made of, not what you lift.
+31. **Grithouse** — grit + house: the exact exemplar shape, with House carrying the lineage-cool that made Stronghouse work and grit naming the virtue this product actually trains.
+32. **Ironclad** — the idiom compound: unbreakable. Names the commitment, not the workout.
+33. **Kinsmith** — kin + smith: the one who forges the family. Kinforge's sibling — names the person where Kinforge names the process.
+34. **Grindstone** — wildcard: workshop compound bridging teen "the grind" and granddad "nose to the grindstone"; also literally the tool that sharpens iron.
+35. **Forgeline** — forge + line(age): the family line, forged.
+36. **Squadforge** — the founder's two owned components fused; scored to test whether the splice beats its parents.
+37. **Fieldhouse** — wildcard: where school athletics actually happen; the app as the family's fieldhouse.
+38. **Deadhang** — wildcard, the edge-frontier probe: the product's own first exercise as a brand. Scored deliberately to find where "edge" tips into liability.
+
+**Killed before scoring (one line each; collisions REPORTED/UNVERIFIED):**
+
+| Name | Why killed |
+|---|---|
+| Steelside | Strongside with the meaning swapped out — the football sense is what makes Strongside work; steel keeps the shape, loses the story. |
+| Ironhouse | Reads powerlifting-gym franchise; the one iron name where the barbell promise is unignorable. |
+| Steelhouse | SteelHouse adtech prior use (now MNTN); the eye also auto-corrects it to "steakhouse." |
+| Housestrong | Stronghouse (17) already owns this pairing in the stronger order. |
+| Kinsteel / Steelkin | Dwarf-clan register; the coach can't say it with a straight face. |
+| Crewforge / Forgecrew | "-forge" after a work word reads software tool (SourceForge, CurseForge); kin dodges that echo, crew doesn't. |
+| Bloodforge — kills the blood lane | Video-game register outright (an Xbox title of this name); blood compounds fail C10 for a family/church brand, as Bloodline's C10 = 0 already proved. |
+| Folkstrong / Ironfolk — kills the folk lane | Folksy-precious and fantasy-dwarven respectively; anti-athletic either way. |
+| Homeforge | Home- carries the round-1 generic flag, and to the 9–14 demo "Forge" next to a home word reads Minecraft mod-loader (Minecraft Forge). |
+| Castiron | The skillet owns it. |
+| Anvilside / anvil compounds | The anvil is the thing that gets hit; round 1's Anvil (14) already found the metaphor's ceiling. |
+| Temper / Tempered compounds | No compound partner survives the ear; promoted to coach copy instead ("tempered together"), where it's excellent. |
+| Ironwill | Flat familiar-phrase compound — the HomeTeam lesson applies; plus a Disney sled-dog film of that name. |
+| Groundgame | Real grappling term, but it has "game" in it; G2 doesn't bend. |
+| Kincrucible / Cruciblehouse / Ironcrucible / The Crucible Club — kills the Crucible-compound lane | Three Latinate syllables refuse to compound: every attempt fails C5 and sounds worse than the word alone. Finding: **Crucible doesn't compound — it wants the definite article and a stage.** That's an event name, not a brand fragment; ruling in R2.5. |
+
+### R2.3 Round-2 scoring matrix
+
+Same 0–2 scale, max 20; C7 remains a plausibility guess — UNVERIFIED.
+
+| Name | Lane | C1 Athletic | C2 Teen | C3 Generic | C4 Identity | C5 Speak | C6 Search | C7 Dom/TM* | C8 Voice | C9 Grow | C10 Clean | **Total** |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| **Fieldhouse** | wildcard | 2 | 2 | 2 | 2 | 2 | 1 | 1 | 2 | 2 | 2 | **18** |
+| **Ironside** | side × iron | 2 | 2 | 2 | 2 | 2 | 1 | 1 | 2 | 2 | 1 | **17** |
+| **Ironclad** | iron idiom | 2 | 2 | 2 | 2 | 2 | 1 | 0 | 2 | 2 | 2 | **17** |
+| **Grithouse** | house × grit | 2 | 2 | 2 | 2 | 2 | 1 | 1 | 1 | 2 | 1 | **16** |
+| **Kinsmith** | kin × smith | 1 | 1 | 2 | 1 | 2 | 2 | 2 | 1 | 2 | 2 | **16** |
+| **Grindstone** | wildcard | 2 | 2 | 2 | 1 | 2 | 1 | 1 | 2 | 2 | 1 | **16** |
+| **Squadforge** | squad × forge | 1 | 1 | 2 | 1 | 2 | 1 | 2 | 1 | 2 | 2 | **15** |
+| **Forgeline** | forge × line | 1 | 1 | 2 | 1 | 2 | 1 | 1 | 1 | 2 | 2 | **14** |
+| **Deadhang** | wildcard | 2 | 2 | 2 | 0 | 2 | 1 | 1 | 0 | 0 | 1 | **11** |
+
+**Selection notes (judgment over score, stated — as in round 1):**
+
+- **Fieldhouse (18) is held out of the top 5 on the taste rule.** By criteria it's the round's top scorer — and it's the best name in a genre the founder has already rejected (the HomeTeam/Homefield flat-familiar-phrase genre). Round 1 held IronPact out on taste; the same discipline cuts the other way here. If his taste shifts, it's on the record at 18.
+- **Deadhang (11) worked as intended** — it marks the edge frontier. The C4/C8/C9/C10 collapse shows exactly where "edge" tips over: it self-collides with an in-product exercise (the Trials dead hang), hard-codes a v1 movement, and leads with a word the church wedge shouldn't.
+- **Squadforge (15) confirms the fusion doesn't beat its parents** — SquadStrong and Kinforge are each stronger than their splice.
+- Within the 16–17 band, top-5 order below follows taste-profile fit, not raw score.
+
+**The iron note (the founder's tension, resolved per name).** Two reframes change the math. First: in the church-community wedge channel, iron already has a non-barbell meaning — *"As iron sharpens iron, so one person sharpens another"* (Proverbs 27:17) is native scripture about precisely what this product does: people sharpening each other through shared work. Second: the Phase 3 weights arc means iron is a misnomer with an expiry date — these names grow *into* the product. Per name: **Ironside** — iron as earned epithet (Edmund Ironside), not equipment; lowest first-contact dissonance. **Ironclad** — iron sealed inside an idiom meaning unbreakable; nobody hears barbells in "an ironclad promise." **IronPact** (round 1) — the *pact* is what's iron; this reframe rehabilitates the name the founder already liked. **Ironhouse** — killed above: the one construction where the barbell promise is unignorable. Honest residual: in an app-store screenshot, "Iron-" beside a bodyweight app still costs one beat of dissonance; the tagline has to spend that beat well.
+
+### R2.4 Round-2 top 5
+
+#### 1. Ironside — 17/20
+
+**Rationale.** Strongside's harder twin, and the round's best fusion of what the founder likes (Strongside's shape, iron's edge) with what round 1 proved (side names carry the mission). It reads as an earned epithet, not gear — Edmund Ironside was named for toughness in battle, and "Old Ironsides" earned the name under cannon fire (both REPORTED). The side-by-side reading survives intact from Strongside, and in the wedge channel the name sits one step from Proverbs 27:17.
+
+**The 14-year-old test.** "Ironside" on a shirt reads as an athletic brand with edge — no family disclosure, no cringe, worn with mild pride. Of every name across two rounds, this one most looks like merch he'd choose himself.
+
+**Tagline pairing.** *"Ironside. Forged side by side."* Wedge alt: *"Iron sharpens iron."*
+
+**Risks.** (1) Ironside the TV franchise — Raymond Burr's detective series (1967–75) plus a 2013 remake; parents over 50 may hear it first (REPORTED; live-mark relevance for classes 9/41/42 UNVERIFIED). (2) Gyms named Ironside plausibly exist — class 41 common-law check needed (UNVERIFIED). (3) ironside.com presumed taken (UNVERIFIED). (4) First-contact iron/bodyweight dissonance — one beat; the tagline spends it.
+
+#### 2. Grithouse — 16/20
+
+**Rationale.** The purest expression of the founder's exemplar shape: {family word} × {strength word}, with House carrying the lineage-cool that made Stronghouse work (17) and grit naming the exact virtue the product trains — showing up on the chaotic Tuesdays. It's Stronghouse with the generic word swapped for the sharp one. Edge without darkness.
+
+**The 14-year-old test.** Sounds like a boxing gym or a streetwear label; passes with swagger — *if* it survives the smirk test (risk 1). Watch his face on this one specifically.
+
+**Tagline pairing.** *"Grithouse. Built on showing up."* Alt: *"One house. All grit."*
+
+**Risks.** (1) **The playground rhyme:** Grithouse sits one consonant from a vulgar near-rhyme, and 14-year-olds are professionals at finding it. If anyone at the dinner table smirks, believe them — that joke transfers to school with the shirt. This is exactly the failure the in-house test (§6.6) exists to catch. (2) Boutique gyms/CrossFit boxes plausibly named Grit House — class 41 common-law risk (REPORTED, UNVERIFIED). (3) The same faint gym-franchise ring that docked Stronghouse.
+
+#### 3. Ironclad — 17/20
+
+**Rationale.** The cleanest iron semantics on the board. "Ironclad" is a fixed idiom meaning unbreakable — an ironclad promise — so the metaphor lands on the commitment rather than the equipment, and the commitment is the product's moral center (the Weekly Pact). It's the rare edge-name that's secretly warm: what it claims is *this family doesn't break.* The coach gets it for free: "Pact's in. Make it ironclad."
+
+**The 14-year-old test.** A real word with a hard sound; reads like an apparel brand; zero cringe, no explanation needed.
+
+**Tagline pairing.** *"Ironclad. Some things don't break."* Alt: *"An ironclad family."*
+
+**Risks.** (1) **Ironclad, the contract-management software company, is prominent and sits in the same trademark classes (9/42)** even though the market is unrelated — the likeliest hard blocker in round 2; check before falling for it (REPORTED, UNVERIFIED). (2) Dictionary word — noisy search ("ironclad guarantee" content). (3) Adjective-as-brand: identity language is excellent ("we're Ironclad"), usage language is weak ("Ironclad tonight?" doesn't parse) — the mechanic vocabulary (Pact night, Trials week) has to carry daily usage.
+
+#### 4. Kinsmith — 16/20
+
+**Rationale.** Kinforge's sibling: kin × smith, "the one who forges the family." Where Kinforge names the process, Kinsmith names the person — which quietly flatters the buyer, because the parent *is* the kinsmith. Same coined-name ownability lane as Kinforge (clean mark, total search ownership), and "smith" is the plainest Anglo-Saxon trade word there is, which keeps the coach voice honest where most coined names go startup-y.
+
+**The 14-year-old test.** Reads like a surname — a neutral pass. No cringe, but no shirt-pride either; the kin-preciousness flag from the Kinforge addendum applies in full.
+
+**Tagline pairing.** *"Kinsmith. Forged, not given."* (The lane shares its coach line with Kinforge.) Alt: *"Forge your people."*
+
+**Risks.** (1) Artisan ring — sounds like a bespoke leather-goods shop until the visual identity corrects it. (2) Its honest role is understudy: if the kin lane wins the dinner table, Kinforge (owned domains, harder final syllable) probably still beats it — Kinsmith exists to probe the lane, not to displace its owner. (3) kinsmith.com status UNVERIFIED.
+
+#### 5. Grindstone — 16/20
+
+**Rationale.** The wildcard that earns its slot from outside the grid. A workshop compound with a built-in generational bridge: the 14-year-old says "the grind" unprompted; his grandfather said "nose to the grindstone" — the same virtue, seventy years apart, one word, and transmitting that virtue across the gap is what the product is for. Bonus coherence: a grindstone is what sharpens iron — it sits inside the same metallurgy story as the forge names, one step from the wedge's favorite proverb.
+
+**The 14-year-old test.** Hustle-adjacent in a good way; shirt-plausible; he'll connect it to "the grind" without help.
+
+**Tagline pairing.** *"Grindstone. The grind, together."* Alt: *"Where the edge comes from."*
+
+**Risks.** (1) Grindstone is a known indie video game (Capybara Games — REPORTED); different category, but it's App Store search noise and a teen-visible collision. (2) "Grind" cuts two ways: a mild crude-slang reading at low salience, and a hustle-culture never-stop connotation that rubs against "consistency over perfection, gentle resets" — manageable in the voice, but real friction. (3) Common word; crowded namespace (coffee shops, productivity apps — UNVERIFIED).
+
+### R2.5 The Crucible ruling — event name, not brand
+
+**Compounding failed honestly** (see the kill table): Crucible's three Latinate syllables front-load every compound past the speakable bar, and each attempt sounds worse than the word alone. Crucible wants the definite article and a stage. That is an event name.
+
+**The ruling: give "The Crucible" to the Challenge system — not to Trials, and not to the brand.**
+
+- **Keep Trials untouched.** "Trials" is already perfect, owned vocabulary, and the flagship benchmark ritual (Trials 2.0's whole emotional arc is built on it). Renaming it would trade an owned word for a borrowed one — and it would *invert* the Destiny reference the founder loves: in Destiny, the Crucible is the standing arena and Trials is its pinnacle event (REPORTED). Renaming Trials "The Crucible" gets the homage backwards.
+- **"Challenges" is the weakest word in the product vocabulary** — every app on earth has challenges. Renaming the earned max-effort event system "The Crucible" is a strict upgrade: distinctive, severe, earned. Copy mechanics work immediately: *"You've earned a Crucible."* / *"Crucible unlocked: The Family 500."* And the flagship Co-op format becomes the metaphor made literal — the whole family climbs into the crucible together; shared heat is what bonds metal. That is the brand story told by a feature name.
+- **The pairing is the payoff.** Trials (sacred monthly benchmark) + The Crucible (earned max-effort arena) reads to a Destiny-playing 14-year-old as a wink from someone who gets it, and to a parent as the Marines (the Crucible — recruit training's 54-hour culminating test, REPORTED) and English class (Miller). Dual-register is exactly what the coach voice wants.
+- **G2 sanity check:** G2 kills names whose *dominant* association is a video game (Kratos). Crucible's dominant association outside gaming remains metallurgy/Miller/Marines — the word predates and exceeds the game. Passes.
+
+**Risk assessment (all REPORTED/UNVERIFIED):**
+
+| Prior use | What it is | Risk for in-product feature use |
+|---|---|---|
+| Bungie's Crucible | Destiny/Destiny 2 PvP mode (2014–present); standalone registered-mark status UNVERIFIED | **Low** — a mode name inside their game, distant context. If "Enter the Crucible" ever becomes hero *marketing* copy, re-check first: the audiences overlap. |
+| Amazon's Crucible | 2020 free-to-play shooter, cancelled the same year | **Low** — dead product; residual TM status UNVERIFIED. |
+| Arthur Miller's *The Crucible* | 1953 play | **None** — no mark issue; the literary weight actually helps with parents. |
+| USMC Crucible | Recruit training's culminating event | **None/positive** — the exact register ("earned, severe, transformative") the feature wants. |
+| The Crucible, Oakland | Industrial-arts school; plus plausible gyms/boxes named Crucible (UNVERIFIED) | **Low** for a feature name; would matter for a brand (class 41). |
+
+Net: **low risk as an in-product system name; moderate-to-high as a brand** — which the compounds-only taste rule already forecloses. If adopted, `docs/design/trials-and-challenges.md` (§Challenges 2.0) picks up the rename at its next revision.
+
+### R2.6 Combined slate — round 1 + round 2 + owned domains
+
+Taste filter applied to the slate only; all round-1 scores stand for comparability. **Dropped from the slate on taste:** HomeTeam (18), Homefield (18), The Yard (17), Lineup (17), and Pact-as-brand (16) — single words and flat familiar phrases are out per R2.1; the Weekly Pact *mechanic* keeps its name. Fieldhouse (18) excluded per the R2.3 selection note.
+
+| Rank | Name | Source | Score | Dinner table | The case in one line |
+|---|---|---|---|---|---|
+| 1 | **Strongside** | R1 | 19 | Yes | Survived a full-board attack from the founder's own favorite lanes; the iron names' edge without the barbell tax, and the double meaning is the mission. |
+| 2 | **IronPact** | R1 bench, restored | 18 | Yes | The taste profile overturns round 1's hold-out — that "supplement ring" is his register; the iron note resolves the bodyweight objection (the *pact* is what's iron). Brand = mechanic is still the structural prize. |
+| 3 | **Ironside** | R2 | 17 | Yes | Strongside's harder twin; same shirt, different mark — verify as a pair. |
+| 4 | **Kinforge** | Owned | ~16 | Yes | The unblockable fallback: domains in hand, coined mark, the forge story. Dinner-table probes: kin-preciousness, and ask the boys what they hear in "forge" (Minecraft Forge echo — REPORTED). |
+| 5 | **Grithouse** | R2 | 16 | Yes | The edge frontier; the smirk test decides its fate in one evening. |
+| 6 | Ironclad | R2 | 17 | — | Best semantics in round 2, but verify-first: the same-class software collision is the likeliest hard wall. |
+| 7 | Stronghouse | R1 | 17 | — | Keeper of the house lane if Grithouse smirks out. |
+| 8 | SquadStrong | Owned | ~16 | — | Dated-squad risk unresolved; the domains stay valuable for the community/league layer under any brand. |
+| 9 | Kinsmith | R2 | 16 | — | Kinforge's understudy; advances only if the kin lane wins and Kinforge somehow falls. |
+| 10 | Grindstone | R2 | 16 | — | Wildcard alive; second-table-read material. |
+
+**Recommendation.** **Strongside remains the pick.** Round 2 attacked it from every lane the founder loves, and nothing beat it: it has the compound shape and the edge he wants, none of the iron dissonance, and a double meaning — stronger side by side — that *is* the mission. Take **Strongside, IronPact, and Ironside** through the §6 verification sweep as one batch (adjacent territory; one USPTO/domain/app-store pass covers all three), with **Kinforge riding along as the owned, unblockable fallback**. If Strongside falls at verification, Ironside is the same shirt with a different mark; if the whole lane falls, Kinforge can't be blocked — only disliked, which is what the dinner table is for. The dinner-table five: **Strongside, IronPact, Ironside, Kinforge, Grithouse** — the 14-year-old's face ranks them, and a smirk at Grithouse is data. And adopt the R2.5 ruling regardless of brand outcome: **the Challenge system becomes The Crucible; Trials stays Trials.**
+
+---
+
+_Round 2 owner: naming agent (Fable session), for founder review. Supersedes §5's verification list: the sweep set is now Strongside, IronPact, Ironside (+ Kinforge, already owned). The Crucible ruling is an in-product vocabulary decision, independent of the brand choice._
