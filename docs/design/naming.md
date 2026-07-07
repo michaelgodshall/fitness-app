@@ -237,3 +237,15 @@ Every availability claim above is UNVERIFIED. Before committing to any name:
 ---
 
 _Doc owner: founder. Next step: verification sweep on Strongside, HomeTeam, Pact (+ Homefield if Homefield Apparel clears). Name must be locked before Phase 1 beta recruitment materials are drafted._
+
+---
+
+## Addendum — founder-owned domains (2026-07-07)
+
+The founder already owns, from earlier project work: **squadstrong.com**, **squadstrong.fit**, **kinforgefit.com**, **kinforge.fit**. Not committed to either name, but ownership removes the largest verification uncertainty (domain cost/availability) for these two — a real criterion every other candidate scores UNVERIFIED on.
+
+**SquadStrong** — Strategy B (family-team language). Strengths: "squad" is genuinely teen-adjacent vocabulary, athletic register, no gender coding, speakable/spellable, and it dovetails with the already-adopted **Squad Consistency Bar** mechanic (church/men's-group squads) — the brand could *name* the community layer. Risks: "squad" as slang peaked late-2010s and may read slightly dated to a 2026 teen (test this — the 14-year-old's reaction is the data); the CamelCase compound has the same slightly-supplement-brand ring that held IronPact out of the top 5; likely crowded App Store space around "squad" fitness terms (UNVERIFIED). Rough score against §2 criteria: **~16/20**.
+
+**Kinforge** — coined compound (Strategy E). Strengths: the most *ownable* name on the entire board (coined = clean trademark lane, total search ownability); the forge metaphor is deeply on-mission — strength forged through shared struggle is literally the brand story, and it hands the coach voice a gift ("forged, not given"); "kin" resonates with the family-values wedge communities. Risks: "kin" is precious/archaic to a teen ear — nobody 14 says kin; a mild fantasy-guild ring (test whether that's a bug or a feature with the boys); ideally wants kinforge.com, status UNVERIFIED (founder owns kinforgefit.com). Rough score: **~16/20**.
+
+**Ruling for the verification sweep:** neither displaces Strongside/HomeTeam on pure brand quality, but ownership is worth real points at this stage — **add both to the dinner-table test alongside Strongside, HomeTeam, and Pact.** Five names, one evening, the 14-year-old's face ranks them. If Strongside/HomeTeam hit domain walls (parked, five-figure asks), SquadStrong and Kinforge become the pragmatic front-runners at zero acquisition cost. Either way, keep the unused domains — squadstrong.fit makes a fine beta-waitlist or league-landing URL even under another brand.
