@@ -4,7 +4,7 @@ AI-native family training coach: generated bodyweight co-training sessions for p
 
 ## Session start ritual
 1. Read `docs/00-state-of-the-foundation.md` (the top-down view + confidence map), then `docs/04-build-orientation.md` (session protocol + doc authority map), then `docs/01-product-vision.md`, `docs/02-product-strategy.md`, `docs/03-roadmap.md` — they govern. `PLAN.md` is the locked grill artifact; `PLAN-REVIEW-LOG.md` holds the Codex adversarial review trail.
-   - Note: a final engine-doc review pass (F31+, appended to `docs/design/design-review-findings.md`) may have landed after the last commit of the Fable session — if uncommitted findings exist there, triage them as the session's first task.
+   - **Engine docs carry known conflicts (F31-F40 in `docs/design/design-review-findings.md`), arbitration rulings already recorded there.** Do NOT implement engine-data-model.md until the F31/F32 merges are executed per the rulings — that is the next session's first task, ahead of everything else.
 2. Check "Current status" below and the roadmap's "Next 5 working sessions."
 3. `docs/legacy/` is the superseded Oct 2025 plan — reference only, never authority.
 

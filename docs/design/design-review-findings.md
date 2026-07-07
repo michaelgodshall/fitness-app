@@ -204,3 +204,65 @@ Every "open question for the founder" across the doc set, in one list. Roadmap c
 - **Planner ⚙ list:** pattern-taxonomy granularity · block time-model parameters · density-progression thresholds · benchmark cadence (4-6 sessions?) · skill-frequency target · micro-session Pact rules · kids-only intensity cap (session-planner-spec §Calibration).
 - **Skills ⚙ list:** rung spacing (2-6 wk) · entry standards (Strict 10 vs 8; 10 push-ups) · kick-up hold 45s · half-lay standard · high-pull sternum height · straight-arm volume cap · under-10 front-lever gate · mount-check cadence (skill-progressions, ⚙ marks).
 - **Library breadth target** (number) before Phase 1 recruitment — set from observed variety-consumption during Phase 0 (pre-mortem theme 6; see F24).
+
+---
+
+## Second pass — engine docs (post-landing review)
+
+_2026-07-06, same session. Scope: `engine-data-model.md` + `adaptive-engine.md` (both written after the first pass) cross-read against `session-planner-spec.md` (incl. the Pact & slice sections), `workout-experience.md`, `skill-progressions.md`, and PLAN.md §Approach-1/-2. Totals: 2 Critical · 4 High · 4 Medium (F31–F40). Every finding OBSERVED from the current files this session._
+
+**ARBITRATION RULINGS (main-loop Fable, end of session — the "which doc wins" decisions are made; next session executes the mechanical merges. F31/F32 MUST be resolved before any engine code is written):**
+- **F31:** `adaptive-engine.md`'s `CapabilityState` wins (grade/W/confidence/trend/floor — it's the richer model the coaching logic needs); engine-data-model adopts its fields, drops the 0-100 `Difficulty` scale in favor of integer ladder grades, and declares capability an I3-derived **fold over the log** with parent edits as logged override events (never hand-mutated state). adaptive-engine.md §1.1 becomes the authoritative definition; EDM references it.
+- **F32:** `session-planner-spec.md`'s Pact spec wins unconditionally — it is the ratified rule (Codex-loop lineage). EDM restructures `PactWeek`/`PactCredit` around member lines (memberId + date on every credit, required per-member targets, daily cap); ⚙M3 is deleted, replaced by a pointer.
+- **F33:** planner spec's `plan_slice → SlicePlan` wins (the declared time budget matters — it's how a 14-minute slice becomes possible on a 25-minute bus ride); EDM adds the type and function.
+- **F34-F40:** fix direction as each finding's one-line fix states; F35's per-member sets/rounds override and F40's "PB Watch fires only on benchmark blocks + Trials" (with the S5 example corrected) are confirmed as the intended designs.
+
+### F31 (Critical) — The two new docs define two incompatible capability models
+**Files:** `engine-data-model.md` §1.4/⚙M1 ↔ `adaptive-engine.md` §1.1/§9
+The data model's `PatternCapability` is `{ level: Difficulty (0-100 shared scale), chainPointers }` with rung resolution "highest chain rung with difficulty ≤ level, pointer wins," while the adaptive engine's `CapabilityState` is `{ grade: int ladder position, W, confidence, trend, last_trained, floor }` resolved as "chain rung nearest the member's grade" — none of the engine's six fields exist on `FamilyMember`, both docs claim to concretize the planner roster's "per-pattern capability level" (EDM ⚙M1 vs AE §9 delta 2), and they even disagree on authority (AE posture 2: pure fold over the log, never hand-mutated; EDM: Family layer is "slow state, parent-edited"). An agent implementing `plan_session` cannot proceed.
+**Fix:** Merge into one model in engine-data-model.md (recommend: adopt `CapabilityState`'s fields, pick one difficulty representation, declare it an I3-derived fold with parent edits as logged override events) and have adaptive-engine.md reference it.
+
+### F32 (Critical) — The data model cannot express the ratified Pact spec (member lines, daily cap), and ⚙M3 re-answers a settled question differently
+**Files:** `engine-data-model.md` §1.4/§1.8/⚙M3 ↔ `session-planner-spec.md` §Pact & session-credit spec
+The planner spec's ratified accounting is member-line-primary (per-member weekly target 1-5 default 3; any completed session credits 1 per participant; **1 credit per member per calendar day**; family ring = aggregate of lines; week complete when every line completes), but EDM makes `Family.pact.sessionsPerWeek` "the ring target," `PactWeek.target` a single family number, `PactCredit` carries no `memberId` and no daily-cap semantics, `FamilyMember.weeklyTarget` is optional and scoped to gate (d) only — and ⚙M3 marks slice→Pact credit open, then recommends an all-members-sliced family mint that contradicts the spec's per-member line credit (which is exactly the "arithmetic" M3 rejects).
+**Fix:** Restructure `PactWeek`/`PactCredit` around member lines (memberId + date on every credit, required per-member targets, daily-cap rule stated), and replace ⚙M3 with a pointer to the planner spec's already-ratified rule.
+
+### F33 (High) — The slice contract diverges: `plan_slice → SlicePlan` with re-timing and a declared budget vs. a derived `SliceRef` with a fixed dial
+**Files:** `session-planner-spec.md` §Async slice contract ↔ `engine-data-model.md` §1.6/§1.9/§3.5
+The planner spec defines `plan_slice(sessionPlan, member) → SlicePlan` that re-times shared-timer blocks for solo pacing and "fits the member's declared time budget (H1 applies; micro-session rules apply under 15 min)," but EDM has no `SlicePlan` type, no `plan_slice` in its §1.9 function surface (only `sliceOffers`), fixes the dial to the slice estimate (no declared budget), and runs frozen parent `PlannedBlock`s with no re-timed representation.
+**Fix:** Either add `plan_slice`/`SlicePlan` (re-timed blocks, budget input) to EDM §1.6/1.9 or amend the planner spec to the derived-SliceRef model — state explicitly which doc wins.
+
+### F34 (High) — Adaptive-engine's declared library deltas are absent from the data model's library types
+**Files:** `adaptive-engine.md` §9 ↔ `engine-data-model.md` §1.1/§1.3
+AE's §3 advancement check and §1.2 initialization are unimplementable against EDM as written: `Exercise` has no `difficulty_grade` or `graduation_volume`, chain edges have no `carryover_ratio`, and `SkillPath` has no skill→pattern mapping table (§9 deltas 1 and 4) — the same fold-in failure the first pass flagged as F9, repeated between two docs written in the same wave.
+**Fix:** Fold the §9 deltas into EDM's `Exercise`/`ChainRung`/`SkillPath` types (resolving the grade-vs-Difficulty representation per F31).
+
+### F35 (High) — The under-11 set-shaping rule is inexpressible: sets/rounds are shared block state, not per-member
+**Files:** `adaptive-engine.md` §2.3 ↔ `engine-data-model.md` §1.2/§1.5
+AE's binding under-11 rule ("the visible per-set number never shrinks — cut sets/rounds, never the number on the wall," plus a property test asserting it) requires per-member set/round counts, but EDM puts `sets`/`rounds` on the shared `BlockDef` and `SlotAssignment` carries only a per-set target — so "8×2 for Sam while Dad does 15×3" cannot be represented.
+**Fix:** Add a per-member `sets`/`rounds` override to `SlotAssignment` (or `PlannedBlock.assignments`), defaulting to the def's value.
+
+### F36 (High) — Under-11 solo-slice safety rules (F20 fix) didn't make it into the data model's slice lifecycle
+**Files:** `session-planner-spec.md` §Async slice contract ↔ `engine-data-model.md` §1.6/§3.5
+The planner spec requires under-⚙11 slices to be intensity-capped and to demand parent-present confirmation at start, but EDM's slice lifecycle and state machine carry only the H11 PB-verification gate — no start confirmation event/phase and no intensity cap on slice planning, recreating the exact gap F20 closed.
+**Fix:** Add the parent-present confirmation to the slice entry path (§3.5) and the intensity cap to `sliceOffers`/`eligible()` context.
+
+### F37 (Medium) — Adaptive-engine references block types the data model's closed union doesn't have
+**Files:** `adaptive-engine.md` §2.2/§4.1 ↔ `engine-data-model.md` §1.2
+AE's density tiers unlock "EMOM" (T2) and "density finishers, complexes" (T3), and its factor table keys "finisher 0.6" as a block type, but EDM's `BlockDef` union has no EMOM or complex kind and explicitly defines finisher as a session *role*, not a structural kind (for-time and skill-stations also get no factor).
+**Fix:** Align AE's vocabulary to EDM's `BlockDef` kinds + `role` (adding an EMOM kind to EDM if actually intended) and complete the factor table.
+
+### F38 (Medium) — Adaptive-engine runtime state and Reason records have no storage home
+**Files:** `adaptive-engine.md` §1.1/§3/§6 ↔ `engine-data-model.md` §1/§2
+`CapabilityState`'s trend window/confidence/floor, the per-(member, chain) advancement arming/decline counters (§3 anti-nag), and Reason records (emitted on every decision, pinned as golden fixtures in §7) appear in neither EDM's §1 types nor its §2 Convex mirror (which lists `pb_cache`/`pact_cache` but no capability or reasons store), and `SessionPlan.coach` holds only `revealLine`/`closeTease` against AE's one-adaptive-line-per-member budget.
+**Fix:** Add explicit derived-cache shapes (capability_cache, reasons) to EDM §2 and a per-member adaptive-line slot to `SessionPlan.coach`.
+
+### F39 (Medium) — `TargetScheme` and `compute_target` don't compose
+**Files:** `engine-data-model.md` §1.2 ↔ `adaptive-engine.md` §2.2
+EDM derives slot targets from `TargetScheme` (`relative: sub-max | moderate | max` or `fixed`) while AE derives them from `W × block_type_factor × position_factor × freshness_factor × β_band` with no input for slot intensity — neither doc says how `sub-max/moderate/max` maps into the formula or that `fixed` bypasses the engine, so the agent emitting `SlotAssignment.target` has two disconnected recipes.
+**Fix:** Define the mapping once (recommend: intensity → a factor row in AE §2.2's table; `fixed` bypasses) and cross-reference it from `TargetScheme`.
+
+### F40 (Medium) — PB Watch's "relevant all-time best" has no source for ordinary blocks under the new PB model
+**Files:** `workout-experience.md` §S3/§S5 ↔ `engine-data-model.md` §1.7
+EDM's `PBContext` mints PBs only from Trials tests and benchmark-block lineages ("PB Watch reads this"), so the experience doc's PB Watch trigger ("inside 90% of a relevant all-time best") and its S5 example ("MAX — 26 PUSH-UPS — all-time best") are underivable in a non-benchmark block — a silent narrowing of the experience doc with no annotation (the F23 drift pattern).
+**Fix:** State in both docs that PB Watch and close-screen PBs fire only on benchmark blocks and Trials (and fix the S5 example), or add an exercise-level best cache to EDM.
