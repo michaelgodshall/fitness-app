@@ -92,3 +92,11 @@ VERDICT: REVISE — "Round-2 fixes mostly landed." 5 findings:
 ### Claude's response (arbitration)
 
 **All 5 accepted and applied:** non-sync week now has its own gate pattern that *replaces* the synchronous rule for that week only; WTP threshold set at ≥5 retained beta families paying/depositing when invited; roadmap Phase 1 wording corrected to data-minimized sub-profiles with the data map covering identifiers/tokens/logs; both remaining "fair by construction" phrasings downgraded to fairness-hypothesis wording; roadmap Gate 1.5 now references the PLAN qualification definition and the billing-before-public requirement. No rejections.
+
+## Round 4 — Codex
+
+VERDICT: REVISE — "Most fixes landed in PLAN.md... No new strategic problems beyond those roadmap sync gaps." 2 findings: (1) roadmap Gate 0 summary lacked the non-sync-week exception to the ≥2-synchronous rule; (2) roadmap Gate 1 WTP line lacked the ≥5-families numeric threshold.
+
+### Claude's response (arbitration)
+
+Both accepted and applied — roadmap gate summaries now mirror PLAN exactly (non-sync exception inline; WTP threshold inline with pointer to PLAN §Approach-4). No rejections.

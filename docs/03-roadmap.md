@@ -27,7 +27,7 @@ _Foundation doc v2.0 — July 2026. The arc is milestone-gated, not calendar-gat
 
 **Non-goals:** accounts, payments, store submission, Trials, Challenges, coach voice beyond a hand-authored starter set. Web app per ADR-001: anonymous, data-minimized Convex session state (no contact info, founder family only); display device owns in-flight sessions (offline-resilient). Scope cut line and order live in PLAN.md §Approach-1.
 
-**GATE 0→1** (operationalized in full in PLAN.md §Approach-2): 3+ sessions/week × 4+ weeks with **≥2/week synchronous shared** (≥20 min, ≥2 members incl. adult); attendance-friction log ≤20% "pushed"; teen ladder-views ≥1×/week outside sessions + ≥1 self-declared rung test/2 weeks; one deliberately **non-synchronous week** in which the family system still holds. Week-2 kill-switch: planner sessions run from a plain screen before UI investment.
+**GATE 0→1** (operationalized in full in PLAN.md §Approach-2): 3+ sessions/week × 4+ weeks with **≥2/week synchronous shared** (≥20 min, ≥2 members incl. adult); attendance-friction log ≤20% "pushed"; teen ladder-views ≥1×/week outside sessions + ≥1 self-declared rung test/2 weeks; plus one deliberately **non-synchronous week** whose own gate pattern *replaces* the ≥2-synchronous rule for that week only (no synchronous session required; every member ≥2 solo slices; ≥3 family session-equivalents; Pact machinery holds). Week-2 kill-switch: planner sessions run from a plain screen before UI investment.
 
 ## Phase 1 — Beta (fall 2026)
 
@@ -37,7 +37,7 @@ _Foundation doc v2.0 — July 2026. The arc is milestone-gated, not calendar-gat
 
 **Do:** naming/brand sprint (before recruitment); incumbent recon + **substitute map** (YouTube/"dad does it manually," youth sports conditioning, homeschool PE, AI generators); recruit **10-15 families** (≤⅓ founder-close) via intentional-father/church communities + r/daddit — free, founding-year price honored later (no lifetime promises); A/B "adaptive coach" vs "AI coach" framing; monthly voice-of-customer calls.
 
-**GATE 1→2 (dropout-honest):** denominator = all recruited; **≥60% at 3+ sessions/week × 6 weeks AND ≥8 retained families**; WTP proven by **payment** (capped founding cohort converts at ~$79 founding-year price, or live pricing/deposit test) — not interviews. **GATE 1.5:** ≥25 qualified cold waitlist signups (qualified as defined in PLAN §Approach-4: verified email + parent with kids 8-14 + explicit beta interest + stated 3×/week willingness) or ≥3 cold-recruited families before public-launch spend; billing (Stripe + entitlements) live for the private founding cohort as Phase 1 exit work.
+**GATE 1→2 (dropout-honest):** denominator = all recruited; **≥60% at 3+ sessions/week × 6 weeks AND ≥8 retained families**; WTP proven by **payment** — ≥5 retained beta families pay or deposit at the ~$79 founding-year price when invited (numeric threshold per PLAN §Approach-4) — not interviews. **GATE 1.5:** ≥25 qualified cold waitlist signups (qualified as defined in PLAN §Approach-4: verified email + parent with kids 8-14 + explicit beta interest + stated 3×/week willingness) or ≥3 cold-recruited families before public-launch spend; billing (Stripe + entitlements) live for the private founding cohort as Phase 1 exit work.
 
 ## Phase 2 — Public v1 (winter 2026-27)
 
