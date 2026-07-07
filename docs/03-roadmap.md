@@ -33,11 +33,11 @@ _Foundation doc v2.0 — July 2026. The arc is milestone-gated, not calendar-gat
 
 **Gates before recruitment:** COPPA compliance gate (data map incl. persistent identifiers on child surfaces, vendor DPAs, analytics policy, parental review/delete flows, counsel or safe-harbor review) + **youth-S&C sign-off** on the planner's H11 layer.
 
-**Build:** accounts + family model (parent-owned sub-profiles, no child PII); monthly Trials (first Trials = calibration baseline, mints no Progress Points); Challenges; onboarding (<2 min, from legacy flows — they were good); coach voice v1; **both-parent monthly recap**. Web app is already live from Phase 0 — no store submission needed until Phase 2 native.
+**Build:** accounts + family model (data-minimized child sub-profiles — no child accounts or contact info; the COPPA data map covers identifiers, tokens, and logs); monthly Trials (first Trials = calibration baseline, mints no Progress Points); Challenges; onboarding (<2 min, from legacy flows — they were good); coach voice v1; **both-parent monthly recap**. Web app is already live from Phase 0 — no store submission needed until Phase 2 native.
 
 **Do:** naming/brand sprint (before recruitment); incumbent recon + **substitute map** (YouTube/"dad does it manually," youth sports conditioning, homeschool PE, AI generators); recruit **10-15 families** (≤⅓ founder-close) via intentional-father/church communities + r/daddit — free, founding-year price honored later (no lifetime promises); A/B "adaptive coach" vs "AI coach" framing; monthly voice-of-customer calls.
 
-**GATE 1→2 (dropout-honest):** denominator = all recruited; **≥60% at 3+ sessions/week × 6 weeks AND ≥8 retained families**; WTP proven by **payment** (capped founding cohort converts at ~$79 founding-year price, or live pricing/deposit test) — not interviews. **GATE 1.5:** ≥25 qualified cold waitlist signups or ≥3 cold-recruited families before public-launch spend.
+**GATE 1→2 (dropout-honest):** denominator = all recruited; **≥60% at 3+ sessions/week × 6 weeks AND ≥8 retained families**; WTP proven by **payment** (capped founding cohort converts at ~$79 founding-year price, or live pricing/deposit test) — not interviews. **GATE 1.5:** ≥25 qualified cold waitlist signups (qualified as defined in PLAN §Approach-4: verified email + parent with kids 8-14 + explicit beta interest + stated 3×/week willingness) or ≥3 cold-recruited families before public-launch spend; billing (Stripe + entitlements) live for the private founding cohort as Phase 1 exit work.
 
 ## Phase 2 — Public v1 (winter 2026-27)
 
@@ -48,7 +48,7 @@ _Foundation doc v2.0 — July 2026. The arc is milestone-gated, not calendar-gat
 
 ## Phase 3 — Deepening (2027)
 
-- Family-vs-family divisions once liquidity exists — scored on **improvement vs. own baseline** (size- and age-fair); church/community leagues as the seeding structure
+- Family-vs-family divisions once liquidity exists — scored on **improvement vs. own baseline** (a fairness hypothesis: calibration baselines, caps, participation floors — league math validated before it ships); church/community leagues as the seeding structure
 - Runtime LLM session generation (premium adaptivity) on top of the proven planner + eval harness
 - Dumbbell/hybrid programs (the teen arc) — architecture already supports it
 - Audience widening beyond the wedge (product already generic)

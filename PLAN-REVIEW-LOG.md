@@ -78,3 +78,17 @@ VERDICT: REVISE — "substance much stronger than round 1"; prior findings mostl
 - **8:** Qualified defined: verified email + parent with kids 8-14 + explicit beta interest + stated 3×/week willingness.
 
 No rejections this round — every finding was either a staleness fix or a convergent catch.
+
+## Round 3 — Codex
+
+VERDICT: REVISE — "Round-2 fixes mostly landed." 5 findings:
+
+1. Non-sync week over-constrained (the ≥2-synchronous weekly rule contradicted the fall simulation — a real logic bug)
+2. Payment-based WTP had no threshold (no denominator/count)
+3. "No child PII" wording still stale in roadmap Phase 1 build line
+4. "Size- and age-fair by construction" survived in PLAN Approach-6 and roadmap Phase 3
+5. Roadmap Gate 1.5 omitted the "qualified" definition
+
+### Claude's response (arbitration)
+
+**All 5 accepted and applied:** non-sync week now has its own gate pattern that *replaces* the synchronous rule for that week only; WTP threshold set at ≥5 retained beta families paying/depositing when invited; roadmap Phase 1 wording corrected to data-minimized sub-profiles with the data map covering identifiers/tokens/logs; both remaining "fair by construction" phrasings downgraded to fairness-hypothesis wording; roadmap Gate 1.5 now references the PLAN qualification definition and the billing-before-public requirement. No rejections.
