@@ -34,7 +34,7 @@ This product is built on 16 months of OBSERVED reality: a father training with h
 Determinism lives exactly where trust and comparability matter:
 - **Monthly Trials** — a fixed 5-test battery (push/pull/legs/core/endurance); the family's stable benchmark.
 - **Challenges** — fixed max-effort events, earned through consistency.
-- **Skill progressions** — fixed, aspirational paths (muscle-up, handstand push-up, pistol squat, front lever) that give older kids something to train *toward*.
+- **Skill progressions** — fixed, aspirational paths (pull-up — the universal on-ramp — then muscle-up, handstand push-up, pistol squat, front lever) that give every kid a live next rung and older kids something to train *toward*.
 
 Generation lives where variety matters: the daily session. Under the hood (v1): a deterministic planner assembles sessions from a founder-reviewed exercise/block library inside hard constraints; LLMs generate library candidates in reviewed batches and power the coach's voice. No AI improvisation stands between a family and a workout.
 

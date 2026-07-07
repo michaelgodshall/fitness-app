@@ -24,6 +24,11 @@ _Foundation doc v2.0 — July 2026. The arc is milestone-gated, not calendar-gat
 5. Skills v0 — 5 hand-authored progression paths (pull-up [the on-ramp], muscle-up, HSPU, pistol, front lever); no polish — teen-drift instrumentation (must include the "rung unlocked" feedback beat at session close; see docs/design/skill-progressions.md)
 6. Engine eval harness — planner unit tests + a founder review workflow for generated blocks (explicit deliverable, not an afterthought)
 7. Async slice-completion substrate — a member who misses the family session can complete their scaled portion solo (any device/time), banking it to their Pact line. Synchronous sessions stay the flagship; the slice is the school-year pressure valve. (Ratified from pre-mortem — see docs/design/pre-mortem-and-backlog.md)
+8. Consistency armor behaviors: pre-generated tonight's session (open = start), any-member start, Tomorrow's Card (night-before reserve), Reset Rep, Absence Ledger — all planner/lobby behaviors, small individually (adopted from pre-mortem backlog)
+9. Hand-authored coach-line starter set (Tier 1 templates for PB/Pact/session moments — coach-voice.md governs register; full pipeline is Phase 1)
+10. Controller-dependent extras, cut-eligible: Ghost Bar, Secret Assignment, Session Authorship Token (teen autonomy hook)
+
+**This list (items 1-10) is the canonical Phase 0 scope** (per design-review F2); PLAN's cut line governs what leaves it and in what order. Anything not listed here is not Phase 0.
 
 **Non-goals:** accounts, payments, store submission, Trials, Challenges, coach voice beyond a hand-authored starter set. Web app per ADR-001: anonymous, data-minimized Convex session state (no contact info, founder family only); display device owns in-flight sessions (offline-resilient). Scope cut line and order live in PLAN.md §Approach-1.
 
@@ -31,7 +36,7 @@ _Foundation doc v2.0 — July 2026. The arc is milestone-gated, not calendar-gat
 
 ## Phase 1 — Beta (fall 2026)
 
-**Gates before recruitment:** COPPA compliance gate (data map incl. persistent identifiers on child surfaces, vendor DPAs, analytics policy, parental review/delete flows, counsel or safe-harbor review) + **youth-S&C sign-off** on the planner's H11 layer.
+**Gates before recruitment:** COPPA compliance gate (data map incl. persistent identifiers on child surfaces, vendor DPAs, analytics policy, parental review/delete flows, counsel or safe-harbor review) + **youth-S&C sign-off** on the planner's H11 layer + **library breadth target met** (⚙ size set during Phase 0 from observed variety-consumption — pre-mortem theme 6; the authoring pipeline's throughput math governs).
 
 **Build:** accounts + family model (data-minimized child sub-profiles — no child accounts or contact info; the COPPA data map covers identifiers, tokens, and logs); monthly Trials (first Trials = calibration baseline, mints no Progress Points); Challenges; onboarding (<2 min, from legacy flows — they were good); coach voice v1; **both-parent monthly recap**. Web app is already live from Phase 0 — no store submission needed until Phase 2 native.
 

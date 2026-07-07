@@ -17,7 +17,7 @@ _Design doc — July 2026 (Fable session). Redesigns `docs/legacy/02-systems-arc
 ### Two-axis scoring: Capacity + Progress
 
 - **Capacity (individual, absolute, sacred).** Universal tier thresholds per test, Rookie → Champion, unchanged from legacy philosophy. Never age-adjusted. This is the honest measure — athletic respect demands it stays.
-- **Progress (the family headline).** **Progress Points**: earned whenever a member sets a new *all-time best* on a test, scaled by margin of improvement. The family's monthly Trials result = total Progress Points + participation.
+- **Progress (the family headline).** **Progress Points**: earned whenever a member sets a new *all-time best* on a test, scaled by margin of improvement. The family's monthly Trials result = total Progress Points + participation. **Calibration rule (per PLAN §Approach-3): a family's first Trials is baseline-only — every result is trivially an all-time best, so it mints zero Progress Points; minting begins with the second Trials.** (The Trials-ceremony PP animation in workout-experience.md §4.5 is likewise suppressed on a first Trials.)
   - Adding a member can only **add** points — the inclusion bug dies.
   - Kids improve fast and out-earn dad — correct emotional physics (kids should shine; dad's win *is* their progress).
   - Anti-gaming by construction: baseline is *all-time best*, so sandbagging one month buys nothing (you only score by beating your best-ever).
@@ -48,11 +48,11 @@ Permanent, prominent surface: every member's all-time best per test, skill unloc
 1. **New flagship format — the Co-op Challenge.** One shared work pool, whole family against it together: *"The Family 500 — 500 total reps, tag in/out freely, 25-minute cap."* Pool scales deterministically with roster (published formula: per-member quota by age-band... spec in engine design). The 6-year-old's 15 squats count the same as dad's. Scored on completion + time, as a *family*. This is the purest expression of "shared struggle bonds" in the whole product — legacy Challenges were individual efforts scored side-by-side; this is one effort.
 2. **Format rotation:** alternate individual-scored (AMRAP, For-Time) and Co-op Challenges so both muscles — personal grit and family unity — get trained.
 3. **Legacy AFRAP format is cut.** Its spec was ambiguous in the legacy doc (scoring description didn't cohere); two clean individual formats + Co-op is enough. Revisit only with a clean spec.
-4. **Phase 2 hook — Challenge percentiles:** your family's co-op result vs. all families who ran the same challenge (asynchronous, no liquidity needed). The shareable result card lives here too.
+4. **Phase 2 hook — Challenge percentiles:** your family's co-op result vs. all families who ran the same challenge — **hidden until per-challenge cohort N thresholds are met (PLAN §Approach-5); own-history comparison shows first**. The shareable result card lives here too.
 
 ## Interaction with the session engine (design note)
 
-Generated sessions mean whole workouts rarely repeat — so legacy "workout PBs" (template-level) mostly die. Replacement: the planner schedules a recurring **benchmark block** (~every 2 weeks, same block structure inside an otherwise fresh session) to manufacture "beat last time" moments deliberately. Trials PBs (exercise-level) are unaffected. This constraint goes into the planner spec.
+Generated sessions mean whole workouts rarely repeat — so legacy "workout PBs" (template-level) mostly die. Replacement: the planner schedules a recurring **benchmark block** (cadence per planner spec H7, which is authoritative) to manufacture "beat last time" moments deliberately. Trials PBs (exercise-level) are unaffected. This constraint goes into the planner spec.
 
 ## Open questions for the founder
 

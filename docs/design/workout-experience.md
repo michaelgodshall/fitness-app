@@ -1,6 +1,6 @@
 # Workout Experience — The Live Session
 
-_Design doc — July 2026 (Fable session). Designs the end-to-end live session around the big-screen hypothesis (docs/02 §Platform): big screen as shared family display, phones as per-member controllers (Jackbox pattern). Status: draft for founder review. Screen specs here are input to the platform decision, not downstream of it._
+_Design doc — July 2026 (Fable session). Designs the end-to-end live session around the big-screen hypothesis: big screen as shared family display, phones as per-member controllers (Jackbox pattern). Platform decision since RATIFIED (ADR-001, web-first — this doc's §6 constraints shaped it). **Amended post-pre-mortem-ratification (design-review F1):** any-member start (§S1); age-gated PB Watch defaults (§S3); Ghost Bar + Secret Assignment (§2, phasing map); async slice surface (§3). Fence-flag in §6.6 resolved — fence amended in roadmap/PLAN._
 
 ---
 
@@ -29,7 +29,7 @@ The open ritual. Someone opens the session URL on the laptop/monitor/TV (or AirP
 - **Center:** member tiles, greyed. A tile lights (member color + streak count) when that member joins from a phone, or when tapped directly on the display. Joining is the check-in; there is no separate roll call.
 - **Corner:** QR code + 4-letter room code for phone join (see §2).
 - **Time dial:** "How much time?" — three big presets (20 / 30 / 45) plus a nudge control. Settable from any joined phone or the display; last write wins with attribution ("Dad set 30 min"). 45 is the ceiling, always (principle 4).
-- **Go:** one big "Build tonight's session" button. This tap is deliberately on the display — it's the communal trigger, and it doubles as the user gesture that unlocks audio for the rest of the session (browser autoplay policy — see §6).
+- **Go:** one big "Build tonight's session" button. This tap is deliberately on the display — it's the communal trigger, and it doubles as the user gesture that unlocks audio for the rest of the session (browser autoplay policy — see §6). **Any member can hit it — including a kid tapping their own tile first** (pre-mortem theme 1: the operating adult must not be the single point of session initiation; a pre-generated session is already waiting, so a 10-year-old can start family workout night). The lobby also surfaces **catch-up cards** for this week's missed sessions ("W2D2 — your part, ~14 min" → slice mode, §3).
 
 ### S2 — The Reveal
 
@@ -47,7 +47,7 @@ Layout, top to bottom:
 
 - **Block strip:** block name + the block/interval timer — the largest element on screen. Timer-driven blocks auto-advance with an audio count-in ("3-2-1"); the room trains to the screen's clock, not to whoever owns the phone.
 - **Exercise focus:** current exercise name + one-line form cue (text only — no video feeds, per fence). E.g., *"Push-ups — chest to floor, elbows ~45°."*
-- **Member columns:** one column per member: name/color, *this-set target* (per-member — this is the relative-loading magic made visible: Dad 15 / Max 12 / Ryan 8 on the same screen), and live logged total that ticks up as sets land from phones. When a member is inside 90% of a relevant all-time best, their column enters **PB Watch** (color shift + distance-to-best) — the room sees it coming.
+- **Member columns:** one column per member: name/color, *this-set target* (per-member — this is the relative-loading magic made visible: Dad 15 / Max 12 / Ryan 8 on the same screen), and live logged total that ticks up as sets land from phones. When a member is inside 90% of a relevant all-time best, their column enters **PB Watch** (color shift + distance-to-best) — the room sees it coming. **Age-gated default (ratified from pre-mortem theme 3): under-11 members' PB Watch and personal targets render on the personal lens (their/parent's phone) only, not the shared screen — public display is per-member opt-in; 11+ defaults public.** Cross-member deltas never render anywhere. Session zero explicitly observes the 9- and 10-year-old for public-number aversion before these defaults harden.
 - **Bottom strip:** up next (next exercise / next block) + rest indicator.
 
 Advancement: timer blocks advance on the clock; set-based blocks advance when all members have logged or a timer floor expires (unlogged sets stay editable through the next rest — logging never blocks training). Swaps land silently: the member's column re-renders with the new exercise name and a small swap glyph, nothing more.
@@ -123,9 +123,9 @@ This is the founder family's fallback, the offline path, and possibly the Phase 
 - Swaps: long-press a member's column → same swap options.
 - Everything else — reveal, timers, PB Watch, close — is identical. Degraded mode loses zero emotional beats; it only loses parallel input and the private personal lens.
 
-### Solo-member mode
+### Solo-member mode — and slices
 
-One person, one phone: the phone renders the display projection compressed (block + timer + own target) with logging inline. Same arc — reveal, blocks, close — with family surfaces (Pact ring, Record Book writes) intact. In Phase 0-1 this is a member training alone on the family device; in Phase 2 it is the teen companion surface, and solo sessions feed the family Pact — teen drift gets captured by the family system instead of leaving it.
+One person, one phone: the phone renders the display projection compressed (block + timer + own target) with logging inline. Same arc — reveal, blocks, close — with family surfaces (Pact ring, Record Book writes) intact. **A slice is solo-member mode seeded by a missed shared session** (entry: lobby catch-up card; contract: planner spec §Async slice contract): the member runs *their* track of that session at solo pacing, benchmark identity preserved, logs settling into the parent session's history and covering their portion of it. In Phase 0-1 this is a member training alone on the family device; in Phase 2 it is the teen companion surface, and solo sessions feed the family Pact — teen drift gets captured by the family system instead of leaving it.
 
 ### Mid-session failures (continuous, not modal)
 
@@ -181,6 +181,9 @@ Inputs to the platform decision (docs/02 criteria; research swarm in flight):
 | Phone controllers via QR join (A/B vs. laptop-only, founder family) | 0 (cheap A/B per PLAN) |
 | Parent proxy / multi-tile claim | 0 (needed for the 9- and 10-year-old) |
 | Rest-screen skill spotlight (teen instrumentation) | 0 |
+| Async slice mode via lobby catch-up cards (planner spec §Async slice contract) | 0 (gate-load-bearing) |
+| Ghost Bar (phone-private pace-vs-own-best bar; shared screen shows family aggregate only) | 0, controller-dependent (cut-eligible per PLAN cut line) |
+| Secret Assignment (private per-member directives, revealed at cooldown) | 0-1, controller-dependent (cut-eligible per PLAN cut line) |
 | Trials ceremony, judge counter, Trials Report, Record Book surface | 1 |
 | Co-op Challenge (Family 500 screen) | 1 |
 | Teen companion solo mode feeding family Pact | 2 |

@@ -60,6 +60,22 @@ The planner **pre-computes "tonight's session"** from the last-known roster and 
 2. **Golden sessions** — founder-reviewed fixture sessions pinned; regressions diff against them.
 3. **Longitudinal simulation** — generate 8 weeks of synthetic family history (mixed rosters, missed weeks, a Trials cycle); assert invariants hold over the *sequence*: pattern balance never drifts past H2, benchmark cadence honored, novelty maintained, taper triggers. This simulation is also the eval harness for new library batches: a candidate block is accepted only if simulations that include it stay invariant-clean.
 
+## Pact & session-credit spec (added per design-review F3 — this is the retention core)
+
+- **Member line:** each member has a weekly target (default ⚙3, configurable 1-5). Any *completed* session credits 1 to each participant's line: synchronous, solo, slice, or micro-session alike; an aborted session past the halfway checkpoint also credits (existing rule). **Cap: 1 credit per member per calendar day** (three micro-sessions in an evening is one credit — anti-gaming, per Codex round 1).
+- **Family ring** (the S1 lobby surface) = aggregate of member lines vs. aggregate of targets. The family's week is **complete when every member's line is complete** (⚙ v1 rule — revisit if a busy member's line reads as the family's failure; the pre-mortem's "carried, not exposed" principle may argue for an aggregate rule later).
+- **Week boundary:** Monday 00:00 family-local; lines and ring reset; **streak** = consecutive complete family weeks. A missed week resets the streak with zero shame mechanics (Reset Rep fires instead).
+- **Coverage & "session-equivalents" (the gate term, now defined):** a planned session is **covered** when every intended participant has completed their portion — synchronously or via slice — within the week. The non-synchronous gate week requires ≥3 *covered* sessions. Coverage is also the planner's signal for catch-up offers.
+
+## Async slice contract (added per design-review F4)
+
+`plan_slice(sessionPlan, member) → SlicePlan`
+- Extracts the member's per-member track from a shared plan: their blocks, targets, and swap state — **benchmark identity preserved** (a benchmark block in a slice still counts as that benchmark).
+- Re-times for solo pacing (shared-timer blocks become member-paced with the same work/rest structure) and fits the member's declared time budget (H1 applies; micro-session rules apply under 15 min).
+- Completing a slice: credits the member's Pact line (1, daily cap applies), settles logs idempotently into the parent session's history (same set-scoped write semantics), and marks the member's portion of the parent session covered.
+- Entry UX: the lobby shows a **catch-up card** ("W2D2 — your part, ~14 min") for any session from the current week the member missed; slices join via the family's room-code link on any device. (Surface detail in workout-experience.md §3.)
+- **Under-⚙11 slices are intensity-capped and require parent-present confirmation at start** (per design-review F20 — extends the kids-only roster rule to solo slices).
+
 ## Coupling to the authoring pipeline
 
 Every library entry carries the metadata the planner needs (pattern, time model, swap chain, age gates, member-range suitability). The LLM batch-authoring flow generates candidates *with* self-labeled metadata; founder review approves/edits; the simulation harness smoke-tests each accepted batch. The planner is only as good as the library's labeling discipline — labeling accuracy is a review checklist item, not a hope.

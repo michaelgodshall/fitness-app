@@ -42,13 +42,15 @@ All entrants are tiny (1-6 App Store ratings). Honest read, both ways: the white
 
 ## Monetization (posture locked; model research-gated)
 
-- **Posture:** premium product, one price covers the whole family, annual-first. Priced on value ($99-119/yr zone), not on the $9.99 legacy anchor — 2026 comps run $15.99-19.99/mo (REPORTED, from unproven entrants; validate elasticity with beta WTP interviews).
+- **Posture:** premium product, one price covers the whole family, annual-first. Priced on value ($99-119/yr zone), not on the $9.99 legacy anchor — 2026 comps run $15.99-19.99/mo (REPORTED, from unproven entrants; elasticity validated by founding-cohort **payment**, per PLAN §Approach-4 — never by interviews).
 - **Sequenced, not pre-committed** (monetization research, July 2026): free beta → capped time-boxed **paid founding cohort** (~$79/yr founding-year price, NOT locked-forever) as the real WTP instrument → permanent model chosen from own retention data. Both finalists stay live: annual-led trial (the category default — but survivorship-biased evidence, and a hard 14-day trial mismatches a ~66-day family habit) vs. generous freemium (RevenueCat's own community-growth carve-out favors free tiers for referral-driven, multi-person products — every free family is a referral node in the church/dad-group wedge). A **sponsored-family path** stays open regardless (mission + consulting-funnel value).
 - **Billing economics note:** Google's 2026 US fee structure charges the same base fee on subscriptions regardless of billing route, and Apple's 0% external-link regime is paused/litigated — web-primary Stripe is still right for entitlement simplicity, but fee savings are not a load-bearing argument.
 - **Billing:** web-primary billing (Stripe) is attractive if the big-screen/web surface wins the platform decision; do NOT build economics on the temporary 0% US external-purchase fee (SCOTUS pending).
-- **Beta families:** free, with a founding-family lifetime discount honored at launch.
+- **Beta families:** free, with the founding-year price honored at launch (no lifetime promises — PLAN §Approach-3).
 
-## Platform (research-gated; hypothesis on the table)
+## Platform — RESOLVED: see `docs/decisions/adr-001-platform-and-stack.md` (ratified 2026-07-06)
+
+_Web-first on Convex + Clerk; big screen = browser; phones as controllers. The section below is preserved as the historical decision criteria; ADR-001 is authoritative._
 
 - **Settled:** PWA-first is dead (iOS PWA push unreliability + install friction vs. a retention model that rides on weekly re-engagement). Native or hybrid.
 - **Live hypothesis — big-screen-primary:** the founder's family trains with a laptop/32" monitor as the shared display (OBSERVED). Possible native form factor: **big screen displays the shared session; phones act as per-member controllers/loggers** (Jackbox pattern) — solving the who-taps-the-counter problem and giving teens a surface of their own. Nobody in the market builds interactive family training for the living-room screen.
