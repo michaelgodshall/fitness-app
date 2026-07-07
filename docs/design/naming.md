@@ -421,4 +421,17 @@ Taste filter applied to the slate only; all round-1 scores stand for comparabili
 
 ---
 
-_Round 2 owner: naming agent (Fable session), for founder review. Supersedes §5's verification list: the sweep set is now Strongside, IronPact, Ironside (+ Kinforge, already owned). The Crucible ruling is an in-product vocabulary decision, independent of the brand choice._
+_Round 2 owner: naming agent (Fable session), for founder review. The Crucible ruling is an in-product vocabulary decision, independent of the brand choice._
+
+### R2.7 Founder preference pass (2026-07-07 — supersedes the R2.6 ranking and the §5/§6 sweep set)
+
+The founder reviewed the combined slate: **Grithouse is his favorite of the round-2 additions** (rhyme risk disclosed after the fact — the "shithouse" near-rhyme; dinner-table smirk test decides it); **Kinforge and SquadStrong remain strong** for him (both domain-owned); **Ironside is a NO**; **Strongside and IronPact drop to secondary**.
+
+**Current verification/testing order (founder-ranked):**
+1. **Grithouse** — front-runner *conditional on surviving the smirk test with the boys*; if it smirks out, it's out entirely (the risk transfers to school on a shirt).
+2. **Kinforge** — owned, unblockable, coined-mark clean.
+3. **SquadStrong** — owned; probe the dated-slang question with the 14-year-old.
+4. Strongside / IronPact — secondary; keep in the USPTO/domain sweep batch since one pass covers them cheaply.
+5. ~~Ironside~~ — eliminated by founder.
+
+Dinner-table five: **Grithouse, Kinforge, SquadStrong, Strongside, IronPact.** The smirk test on Grithouse is the single most important data point of the evening._
