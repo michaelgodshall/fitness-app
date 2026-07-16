@@ -24,7 +24,7 @@ AI-native family training coach: generated bodyweight co-training sessions for p
 - **No runtime LLM in the workout loop in v1.** Deterministic planner over a founder-reviewed library; LLM only at authoring time (founder reviews every batch) + coach voice.
 - **45-minute cap is inviolable.** Bodyweight-pure v1 (pull-up bar OK). No gender in the data model.
 - **COPPA:** under-13s are parent-owned sub-profiles (nickname + birth year only, no login, verifiable consent).
-- Kebab-case filenames. Decisions get ADRs in `docs/decisions/`.
+- Kebab-case filenames. Decisions get a row in `docs/decisions/decision-log.md` the day they're made (ADRs only for hard-to-reverse + surprising + real-trade-off). **`CONTEXT.md` (repo root) is the ubiquitous language — specs must use its terms; when a doc and CONTEXT.md disagree, fix the doc.** Future plan-hardening sessions use grill-with-docs-codex (not plain grill-me-codex) so both stay current inline.
 
 ## Founder context
 - 8-10 protected hrs/week; client work is primary income. Agents execute between founder sessions; founder does judgment, content review, family testing, community.
