@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Big-Screen Session — Prototype</title>
+<style>
+/* ============================================================
+   BIG-SCREEN LIVE SESSION — prototype (2026-07-18 Fable night)
+   Self-contained. No external requests. Space / click advances.
+   Design: premium athletic, dark, 10-foot legibility.
+   ============================================================ */
+
+:root{
+  --bg:#0a0b0d;
+  --bg2:#101216;
+  --ink:#f3efe6;            /* warm chalk white */
+  --muted:#7f858f;
+  --faint:rgba(243,239,230,.10);
+  --line:rgba(243,239,230,.09);
+  --panel:rgba(243,239,230,.035);
+  --ember:#ff7a18;          /* molten signal — heat / PB */
+  --ember2:#ffb43d;
+  --dad:#5aa9ff;
+  --ryan:#37d39b;
+  --leo:#e8c15a;
+  --sam:#ff6e5a;
+  --disp:"Futura","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --body:"Helvetica Neue",Helvetica,Arial,sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--body);
+  overflow:hidden;
+  -webkit-font-smoothing:antialiased;
+  cursor:default;
+  user-select:none;
+}
+
+/* atmosphere: vignette + faint ember floor glow */
+.stage{
+  position:fixed; inset:0;
+  background:
+    radial-gradient(120% 90% at 50% 118%, rgba(255,122,24,.10), transparent 55%),
+    radial-gradient(100% 80% at 50% -10%, rgba(90,169,255,.05), transparent 60%),
+    linear-gradient(180deg,#0c0e12 0%, var(--bg) 55%, #070809 100%);
+}
+/* film grain */
+.stage::after{
+  content:""; position:fixed; inset:0; pointer-events:none; opacity:.05; mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* ---------- persistent chrome ---------- */
+.chrome-top{
+  position:fixed; top:0; left:0; right:0; z-index:40;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:clamp(14px,2.2vh,28px) clamp(20px,3vw,52px);
+  pointer-events:none;
+}
+.wordmark{ display:flex; align-items:baseline; gap:.7em; }
+.wordmark b{ font-family:var(--disp); font-weight:800; letter-spacing:.02em; font-size:clamp(15px,1.5vw,22px); }
+.wordmark .tick{ width:9px;height:9px;border-radius:2px;background:var(--ember); box-shadow:0 0 14px var(--ember); }
+.family{ font-size:clamp(10px,.85vw,13px); letter-spacing:.34em; color:var(--muted); text-transform:uppercase; }
+
+/* pact ring */
+.pact{ display:flex; align-items:center; gap:14px; }
+.pact .lab{ text-align:right; }
+.pact .lab .t{ font-size:clamp(9px,.7vw,11px); letter-spacing:.32em; color:var(--muted); text-transform:uppercase; }
+.pact .lab .v{ font-family:var(--disp); font-weight:700; font-size:clamp(13px,1.1vw,17px); letter-spacing:.04em; margin-top:3px; }
+.ring{ width:clamp(46px,4vw,60px); height:clamp(46px,4vw,60px); transform:rotate(0deg); }
+.ring circle{ fill:none; stroke-width:7; stroke-linecap:round; transition:stroke .6s ease; }
+.ring .seg-off{ stroke:var(--faint); }
+.ring .seg-on{ stroke:var(--ember); filter:drop-shadow(0 0 6px rgba(255,122,24,.55)); }
+
+.watermark{
+  position:fixed; bottom:14px; left:0; right:0; z-index:41; text-align:center; pointer-events:none;
+  font-size:11px; letter-spacing:.42em; text-transform:uppercase; color:rgba(243,239,230,.22);
+}
+.hint{
+  position:fixed; bottom:14px; right:clamp(20px,3vw,52px); z-index:41; pointer-events:none;
+  font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:rgba(243,239,230,.30);
+  display:flex; align-items:center; gap:9px;
+}
+.hint kbd{ border:1px solid var(--line); border-radius:5px; padding:2px 8px; font-family:var(--body); font-size:10px; color:var(--muted); }
+.mutebtn{
+  position:fixed; top:clamp(14px,2.2vh,28px); left:50%; transform:translateX(-50%);
+  z-index:45; pointer-events:auto; cursor:pointer;
+  font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted);
+  border:1px solid var(--line); border-radius:20px; padding:5px 14px; background:rgba(0,0,0,.2);
+}
+.mutebtn:hover{ color:var(--ink); }
+
+/* ---------- beat layering ---------- */
+.beat{
+  position:fixed; inset:0; z-index:10;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:clamp(70px,10vh,120px) clamp(30px,5vw,90px);
+  opacity:0; visibility:hidden; transform:translateY(14px) scale(.995);
+  transition:opacity .55s ease, transform .55s ease, visibility .55s;
+}
+.beat.active{ opacity:1; visibility:visible; transform:none; z-index:20; }
+
+/* shared reveal helper */
+.up{ opacity:0; transform:translateY(18px); }
+.beat.active .up{ animation:rise .7s cubic-bezier(.2,.7,.2,1) forwards; }
+@keyframes rise{ to{opacity:1; transform:none} }
+.d1{animation-delay:.05s} .d2{animation-delay:.16s} .d3{animation-delay:.30s}
+.d4{animation-delay:.46s} .d5{animation-delay:.64s} .d6{animation-delay:.84s} .d7{animation-delay:1.06s}
+
+.eyebrow{ font-size:clamp(11px,1vw,15px); letter-spacing:.42em; text-transform:uppercase; color:var(--muted); }
+.coach{
+  font-family:var(--body); font-weight:400; color:var(--ink);
+  font-size:clamp(20px,2.5vw,38px); line-height:1.22; max-width:20ch; text-align:center;
+  letter-spacing:-.01em;
+}
+.coach .sig{ color:var(--muted); font-size:.55em; letter-spacing:.34em; text-transform:uppercase; display:block; margin-bottom:.9em; }
+
+/* ============ S1 LOBBY ============ */
+#lobby{ justify-content:space-between; }
+.lobby-head{ text-align:center; margin-top:1vh; }
+.lobby-head .greet{ font-family:var(--disp); font-weight:800; font-size:clamp(30px,4.4vw,68px); letter-spacing:-.01em; }
+.lobby-head .sub{ margin-top:14px; color:var(--muted); font-size:clamp(13px,1.2vw,18px); letter-spacing:.05em; }
+.roster{ display:flex; gap:clamp(16px,2.4vw,40px); }
+.tile{
+  width:clamp(120px,15vw,220px); aspect-ratio:.82;
+  border:1px solid var(--line); border-radius:18px; background:var(--panel);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px;
+  position:relative; overflow:hidden;
+  transition:border-color .5s ease, transform .5s cubic-bezier(.2,.8,.2,1), background .5s;
+  filter:grayscale(1) brightness(.5); opacity:.4;
+}
+.tile .av{
+  width:clamp(52px,6vw,90px); aspect-ratio:1; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--disp); font-weight:800; font-size:clamp(22px,2.6vw,40px);
+  color:#0a0b0d; background:var(--mc,#555);
+}
+.tile .nm{ font-family:var(--disp); font-weight:700; font-size:clamp(16px,1.7vw,26px); letter-spacing:.02em; }
+.tile .streak{ font-size:clamp(10px,.85vw,13px); letter-spacing:.22em; text-transform:uppercase; color:var(--muted); }
+.tile .join{ position:absolute; bottom:14px; font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); opacity:0; transition:opacity .4s; }
+.tile.joined{
+  filter:none; opacity:1;
+  border-color:color-mix(in srgb, var(--mc) 55%, transparent);
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--mc) 30%, transparent), 0 24px 60px -30px var(--mc);
+  transform:translateY(-6px);
+}
+.tile.joined .join{ opacity:1; color:var(--mc); }
+.tile .starter{ position:absolute; top:12px; font-size:9px; letter-spacing:.2em; text-transform:uppercase; color:var(--ember); border:1px solid color-mix(in srgb,var(--ember) 40%, transparent); border-radius:20px; padding:3px 9px; opacity:0; }
+.tile.starter-on .starter{ opacity:1; }
+
+.lobby-foot{ display:flex; align-items:flex-end; justify-content:space-between; width:100%; gap:40px; }
+.join-panel{ display:flex; align-items:center; gap:22px; }
+.qr{ width:clamp(96px,9vw,132px); aspect-ratio:1; background:#0e0f12; border:1px solid var(--line); border-radius:14px; padding:12px; display:grid; }
+.qr .grid{ display:grid; grid-template-columns:repeat(11,1fr); grid-template-rows:repeat(11,1fr); gap:2px; width:100%; height:100%; }
+.qr .grid i{ border-radius:1px; }
+.qr .grid i.on{ background:var(--ink); }
+.join-meta .k{ font-size:11px; letter-spacing:.3em; text-transform:uppercase; color:var(--muted); }
+.join-meta .code{ font-family:var(--disp); font-weight:800; font-size:clamp(34px,4.4vw,64px); letter-spacing:.16em; line-height:1; margin-top:6px; }
+.join-meta .code b{ color:var(--ember); }
+.join-meta .scan{ margin-top:8px; font-size:12px; color:var(--muted); letter-spacing:.04em; }
+
+.dial{ text-align:center; }
+.dial .k{ font-size:11px; letter-spacing:.3em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+.presets{ display:flex; gap:10px; justify-content:center; }
+.preset{ font-family:var(--disp); font-weight:700; font-size:clamp(20px,2vw,30px); letter-spacing:.02em;
+  border:1px solid var(--line); border-radius:12px; padding:12px 20px; color:var(--muted); background:transparent; cursor:pointer; transition:.25s; min-width:74px; }
+.preset small{ display:block; font-family:var(--body); font-weight:400; font-size:10px; letter-spacing:.24em; text-transform:uppercase; margin-top:4px; opacity:.7; }
+.preset.sel{ color:var(--ink); border-color:color-mix(in srgb,var(--ember) 55%, transparent); background:rgba(255,122,24,.08); box-shadow:0 0 0 1px color-mix(in srgb,var(--ember) 35%, transparent) inset; }
+.dial .attr{ margin-top:12px; font-size:12px; color:var(--muted); letter-spacing:.05em; height:16px; opacity:0; transition:opacity .5s; }
+.dial .attr.show{ opacity:1; }
+
+.build{
+  font-family:var(--disp); font-weight:800; text-transform:uppercase; letter-spacing:.14em;
+  font-size:clamp(15px,1.4vw,20px); color:#0a0b0d; background:var(--ember);
+  border:none; border-radius:14px; padding:20px 34px; cursor:pointer;
+  box-shadow:0 20px 60px -20px var(--ember); transition:transform .2s, box-shadow .2s;
+  opacity:.35; pointer-events:none;
+}
+.build.ready{ opacity:1; pointer-events:auto; animation:pulseBtn 2.4s ease-in-out infinite; }
+.build .who{ display:block; font-family:var(--body); font-weight:400; text-transform:none; letter-spacing:.02em; font-size:12px; margin-top:5px; opacity:.75; }
+@keyframes pulseBtn{ 0%,100%{box-shadow:0 20px 60px -20px var(--ember)} 50%{box-shadow:0 20px 80px -14px var(--ember)} }
+
+/* ============ S2 REVEAL ============ */
+#reveal .eyebrow{ margin-bottom:30px; }
+.blocks{ display:flex; flex-direction:column; gap:14px; width:min(1000px,86vw); }
+.blk{
+  display:flex; align-items:center; gap:22px; padding:clamp(16px,2vh,26px) clamp(20px,2.4vw,34px);
+  border:1px solid var(--line); border-radius:16px; background:var(--panel);
+  opacity:0; transform:translateX(-24px);
+}
+.beat.active .blk{ animation:slideIn .55s cubic-bezier(.2,.75,.2,1) forwards; }
+@keyframes slideIn{ to{opacity:1; transform:none} }
+.blk .tag{ font-family:var(--disp); font-weight:800; font-size:clamp(13px,1.1vw,16px); letter-spacing:.14em; text-transform:uppercase; color:var(--muted); min-width:96px; }
+.blk.key .tag{ color:var(--ember); }
+.blk .nm{ font-family:var(--disp); font-weight:700; font-size:clamp(20px,2.2vw,34px); letter-spacing:-.01em; flex:1; }
+.blk .flag{ font-size:clamp(11px,1vw,14px); letter-spacing:.06em; color:var(--ember2); border:1px solid color-mix(in srgb,var(--ember) 35%, transparent); border-radius:20px; padding:5px 12px; }
+.blk .dur{ font-family:var(--disp); font-weight:700; font-size:clamp(18px,1.8vw,26px); color:var(--muted); font-variant-numeric:tabular-nums; min-width:60px; text-align:right; }
+.reveal-coach{ margin-top:36px; }
+.reveal-total{ margin-top:26px; font-size:clamp(12px,1vw,15px); letter-spacing:.24em; text-transform:uppercase; color:var(--muted); }
+.reveal-total b{ color:var(--ink); font-family:var(--disp); }
+
+/* ============ S3 BLOCK (focus + live) ============ */
+.block-wrap{ width:min(1240px,94vw); display:flex; flex-direction:column; height:100%; justify-content:center; gap:clamp(18px,3vh,40px); }
+.block-strip{ display:flex; align-items:center; justify-content:space-between; }
+.block-strip .bname{ font-family:var(--disp); font-weight:800; font-size:clamp(20px,2.2vw,34px); letter-spacing:.02em; text-transform:uppercase; }
+.block-strip .bname small{ display:block; font-family:var(--body); font-weight:400; text-transform:none; letter-spacing:.04em; color:var(--muted); font-size:clamp(12px,1vw,15px); margin-top:6px; }
+.timer{ font-family:var(--disp); font-weight:800; font-variant-numeric:tabular-nums; letter-spacing:-.02em;
+  font-size:clamp(64px,13vw,190px); line-height:.86; }
+.timer.lo{ color:var(--ember); text-shadow:0 0 50px rgba(255,122,24,.4); }
+
+.focus-row{ text-align:center; }
+.focus-row .ex{ font-family:var(--disp); font-weight:700; font-size:clamp(24px,3vw,50px); letter-spacing:-.01em; }
+.focus-row .cue{ margin-top:10px; color:var(--muted); font-size:clamp(14px,1.3vw,20px); letter-spacing:.02em; }
+
+.cols{ display:grid; grid-template-columns:repeat(4,1fr); gap:clamp(12px,1.4vw,22px); }
+.col{ border:1px solid var(--line); border-radius:16px; background:var(--panel); padding:clamp(16px,2vh,26px) clamp(12px,1.4vw,22px); text-align:center; position:relative; overflow:hidden; transition:.4s; }
+.col .cn{ display:flex; align-items:center; justify-content:center; gap:10px; }
+.col .dot{ width:12px; height:12px; border-radius:50%; background:var(--mc); box-shadow:0 0 12px var(--mc); }
+.col .name{ font-family:var(--disp); font-weight:700; font-size:clamp(16px,1.5vw,24px); letter-spacing:.03em; text-transform:uppercase; }
+.col .exn{ margin-top:12px; font-size:clamp(13px,1.15vw,18px); color:var(--ink); letter-spacing:.01em; }
+.col .glyph{ font-size:11px; color:var(--muted); }
+.col .tgt{ margin-top:14px; font-size:11px; letter-spacing:.22em; text-transform:uppercase; color:var(--muted); }
+.col .tgt b{ font-family:var(--disp); color:var(--ink); font-size:clamp(15px,1.4vw,20px); letter-spacing:.02em; }
+.col .tgt.private{ color:color-mix(in srgb,var(--mc) 70%, var(--muted)); }
+.col .total{ margin-top:12px; font-family:var(--disp); font-weight:800; font-variant-numeric:tabular-nums; font-size:clamp(40px,5vw,74px); line-height:1; letter-spacing:-.02em; }
+.col .totlab{ font-size:10px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); margin-top:2px; }
+.col .landed{ position:absolute; inset:0; border-radius:16px; box-shadow:0 0 0 2px var(--mc) inset; opacity:0; }
+.col.flash .landed{ animation:landFlash .6s ease; }
+@keyframes landFlash{ 0%{opacity:.9} 100%{opacity:0} }
+/* PB Watch (public, 11+) */
+.col.watch{ border-color:color-mix(in srgb,var(--ember) 55%, transparent); background:rgba(255,122,24,.06); box-shadow:0 0 40px -12px rgba(255,122,24,.5); }
+.col.watch .total{ color:var(--ember2); }
+.col .watchtag{ position:absolute; top:12px; left:0; right:0; font-size:10px; letter-spacing:.2em; text-transform:uppercase; color:var(--ember); opacity:0; }
+.col.watch .watchtag{ opacity:1; }
+.col .matched{ margin-top:8px; font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--ryan); opacity:0; height:14px; }
+.col .matched.show{ opacity:1; }
+
+.midcue{ text-align:center; height:34px; }
+.midcue .c{ display:inline-block; opacity:0; color:var(--ink); font-size:clamp(15px,1.6vw,24px); letter-spacing:.01em; }
+.midcue .c.show{ animation:cueIn 5s ease forwards; }
+@keyframes cueIn{ 0%{opacity:0; transform:translateY(8px)} 12%{opacity:1; transform:none} 82%{opacity:1} 100%{opacity:0} }
+
+.upnext{ display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--line); padding-top:16px; }
+.upnext .l,.upnext .r{ font-size:clamp(11px,1vw,14px); letter-spacing:.2em; text-transform:uppercase; color:var(--muted); }
+.upnext b{ color:var(--ink); font-family:var(--disp); font-weight:700; margin-left:10px; letter-spacing:.02em; }
+
+/* count-in overlay */
+.countin{ position:absolute; inset:0; z-index:30; display:flex; align-items:center; justify-content:center; background:rgba(6,7,9,.72); backdrop-filter:blur(4px); opacity:0; visibility:hidden; transition:.3s; }
+.countin.on{ opacity:1; visibility:visible; }
+.countin .n{ font-family:var(--disp); font-weight:800; font-size:clamp(120px,30vw,420px); line-height:1; color:var(--ink); }
+.countin .n.go{ color:var(--ember); text-shadow:0 0 80px rgba(255,122,24,.6); }
+
+/* ============ S4 REST ============ */
+#rest .eyebrow{ margin-bottom:24px; }
+.rest-count{ font-family:var(--disp); font-weight:800; font-variant-numeric:tabular-nums; font-size:clamp(120px,26vw,380px); line-height:.85; letter-spacing:-.02em; }
+.rest-count.lo{ color:var(--ember); text-shadow:0 0 70px rgba(255,122,24,.45); }
+.rest-next{ margin-top:34px; display:flex; gap:clamp(14px,2vw,34px); }
+.rest-next .rn{ text-align:center; }
+.rest-next .rn .d{ width:10px;height:10px;border-radius:50%;background:var(--mc); margin:0 auto 8px; box-shadow:0 0 10px var(--mc); }
+.rest-next .rn .n{ font-family:var(--disp); font-weight:700; font-size:clamp(13px,1.2vw,17px); text-transform:uppercase; letter-spacing:.06em; }
+.rest-next .rn .x{ margin-top:4px; font-size:clamp(11px,1vw,14px); color:var(--muted); }
+.micropanel{ margin-top:40px; border:1px solid var(--line); border-radius:14px; padding:18px 26px; background:var(--panel); text-align:center; max-width:640px; }
+.micropanel .k{ font-size:10px; letter-spacing:.3em; text-transform:uppercase; color:var(--ryan); }
+.micropanel .v{ margin-top:8px; font-family:var(--disp); font-weight:700; font-size:clamp(18px,1.9vw,28px); letter-spacing:-.01em; }
+.micropanel .step{ margin-top:10px; display:flex; gap:6px; justify-content:center; }
+.micropanel .step i{ width:26px; height:5px; border-radius:3px; background:var(--faint); }
+.micropanel .step i.on{ background:var(--ryan); }
+.micropanel .step i.cur{ background:var(--ryan); box-shadow:0 0 10px var(--ryan); }
+
+/* ============ FINISHER — Family AMRAP ============ */
+#finisher .eyebrow{ margin-bottom:10px; }
+.fin-name{ font-family:var(--disp); font-weight:800; font-size:clamp(26px,3.4vw,54px); letter-spacing:.02em; text-transform:uppercase; }
+.fin-num{ font-family:var(--disp); font-weight:800; font-variant-numeric:tabular-nums; font-size:clamp(110px,24vw,360px); line-height:.85; margin:10px 0; letter-spacing:-.02em; }
+.fin-num .u{ font-size:.18em; letter-spacing:.24em; color:var(--muted); text-transform:uppercase; vertical-align:.9em; margin-left:.3em; }
+.fin-chips{ display:flex; gap:12px; }
+.fin-chips .chip{ display:flex; align-items:center; gap:9px; border:1px solid var(--line); border-radius:20px; padding:8px 16px; background:var(--panel); }
+.fin-chips .chip .d{ width:10px;height:10px;border-radius:50%;background:var(--mc); box-shadow:0 0 10px var(--mc); }
+.fin-chips .chip .n{ font-family:var(--disp); font-weight:700; letter-spacing:.04em; text-transform:uppercase; font-size:clamp(12px,1.1vw,16px); }
+.fin-chips .chip .c{ font-variant-numeric:tabular-nums; color:var(--muted); font-size:clamp(12px,1vw,15px); }
+.fin-cap{ margin-top:26px; font-size:12px; letter-spacing:.24em; text-transform:uppercase; color:var(--muted); }
+
+/* ============ S5 CLOSE ============ */
+.stamp{ text-align:center; }
+.stamp .big{ font-family:var(--disp); font-weight:800; font-size:clamp(40px,6.4vw,110px); letter-spacing:-.01em; line-height:.95; }
+.stamp .row{ margin-top:44px; display:flex; gap:clamp(30px,6vw,90px); justify-content:center; }
+.stat .v{ font-family:var(--disp); font-weight:800; font-variant-numeric:tabular-nums; font-size:clamp(44px,6vw,92px); line-height:1; letter-spacing:-.02em; }
+.stat .k{ margin-top:10px; font-size:clamp(10px,.9vw,13px); letter-spacing:.28em; text-transform:uppercase; color:var(--muted); }
+
+/* PB ceremony (Sam) */
+#pbSam{ background:radial-gradient(120% 100% at 50% 60%, rgba(255,110,90,.10), transparent 60%); }
+.pb-eyebrow{ font-size:clamp(12px,1.2vw,17px); letter-spacing:.5em; text-transform:uppercase; color:var(--sam); }
+.pb-name{ font-family:var(--disp); font-weight:800; font-size:clamp(28px,3.6vw,60px); letter-spacing:.12em; text-transform:uppercase; color:var(--sam); text-shadow:0 0 40px rgba(255,110,90,.4); }
+.pb-num{ font-family:var(--disp); font-weight:800; font-variant-numeric:tabular-nums; font-size:clamp(140px,32vw,460px); line-height:.82; letter-spacing:-.03em; }
+.pb-unit{ font-family:var(--disp); font-weight:700; font-size:clamp(20px,2.4vw,40px); letter-spacing:.3em; text-transform:uppercase; color:var(--muted); }
+.pb-prev{ margin-top:22px; font-size:clamp(15px,1.6vw,24px); color:var(--muted); letter-spacing:.02em; position:relative; display:inline-block; }
+.pb-prev .strike{ position:absolute; left:-4px; right:-4px; top:52%; height:2px; background:var(--sam); transform:scaleX(0); transform-origin:left; }
+.pb-prev.struck .strike{ animation:strike .5s ease forwards; }
+@keyframes strike{ to{transform:scaleX(1)} }
+.pb-delta{ margin-top:8px; font-family:var(--disp); font-weight:700; font-size:clamp(18px,1.9vw,28px); letter-spacing:.12em; text-transform:uppercase; color:var(--sam); }
+
+/* chalk line into record book */
+.chalk{ margin-top:40px; width:min(760px,80vw); text-align:center; }
+.chalk .line{ height:3px; width:100%; background:linear-gradient(90deg,transparent, var(--ink) 12%, var(--ink) 88%, transparent); transform:scaleX(0); transform-origin:center; opacity:.85; filter:blur(.3px); }
+.chalk.draw .line{ animation:chalkLine .9s cubic-bezier(.2,.7,.2,1) forwards; }
+@keyframes chalkLine{ to{transform:scaleX(1)} }
+.chalk .rb{ margin-top:16px; font-size:clamp(11px,1vw,14px); letter-spacing:.34em; text-transform:uppercase; color:var(--muted); opacity:0; }
+.chalk.draw .rb{ animation:rise .6s .5s forwards; }
+.pb-coach{ margin-top:40px; }
+.pb-coach .main{ font-size:clamp(20px,2.5vw,38px); line-height:1.25; max-width:22ch; color:var(--ink); }
+.pb-coach .sub{ margin-top:14px; font-size:clamp(14px,1.4vw,20px); color:var(--sam); letter-spacing:.02em; }
+
+/* close pact + tease */
+.pact-big{ display:flex; flex-direction:column; align-items:center; gap:30px; }
+.pact-big .ring2{ width:clamp(160px,22vw,300px); height:clamp(160px,22vw,300px); }
+.pact-big .ring2 circle{ fill:none; stroke-width:9; stroke-linecap:round; transition:stroke .7s ease; }
+.pact-big .ring2 .off{ stroke:var(--faint); }
+.pact-big .ring2 .on{ stroke:var(--ember); filter:drop-shadow(0 0 10px rgba(255,122,24,.6)); }
+.pact-big .cap{ text-align:center; }
+.pact-big .cap .n{ font-family:var(--disp); font-weight:800; font-size:clamp(30px,4vw,58px); letter-spacing:-.01em; }
+.pact-big .cap .n b{ color:var(--ember); }
+.pact-big .cap .s{ margin-top:12px; color:var(--muted); font-size:clamp(14px,1.3vw,19px); letter-spacing:.03em; max-width:24ch; }
+
+.tease{ text-align:center; }
+.tease .day{ font-family:var(--disp); font-weight:800; font-size:clamp(30px,4.2vw,64px); letter-spacing:-.01em; }
+.tease .ln{ margin-top:24px; font-size:clamp(18px,2.1vw,32px); line-height:1.3; max-width:22ch; color:var(--ink); }
+.tease .sig{ margin-top:34px; font-size:11px; letter-spacing:.4em; text-transform:uppercase; color:var(--muted); }
+.restart{ margin-top:30px; font-size:12px; letter-spacing:.2em; text-transform:uppercase; color:rgba(243,239,230,.35); }
+</style>
+</head>
+<body>
+<div class="stage"></div>
+
+<!-- persistent chrome -->
+<div class="chrome-top">
+  <div class="wordmark"><span class="tick"></span><b>GRITHOUSE</b><span class="family" id="famName">The Godshalls</span></div>
+  <div class="pact">
+    <div class="lab"><div class="t">This week</div><div class="v" id="pactHdr">Session 2 of 3</div></div>
+    <svg class="ring" viewBox="0 0 120 120" id="pactRing"></svg>
+  </div>
+</div>
+<div class="mutebtn" id="mute">Sound on</div>
+<div class="watermark">Prototype · Fable night · not a decision</div>
+<div class="hint"><kbd>space</kbd> / click to advance</div>
+
+<!-- ============ S1 LOBBY ============ -->
+<section class="beat" data-beat="lobby" id="lobby">
+  <div class="lobby-head up d1">
+    <div class="greet">Tuesday night.</div>
+    <div class="sub">Tap in from your phone, or right here on the screen.</div>
+  </div>
+
+  <div class="roster" id="roster">
+    <div class="tile" data-m="dad"  style="--mc:var(--dad)">
+      <div class="starter">Starter</div>
+      <div class="av">D</div><div class="nm">Dad</div><div class="streak">6-week streak</div><div class="join">Joined</div>
+    </div>
+    <div class="tile" data-m="ryan" style="--mc:var(--ryan)">
+      <div class="starter">Starter</div>
+      <div class="av">R</div><div class="nm">Ryan</div><div class="streak">6-week streak</div><div class="join">Joined</div>
+    </div>
+    <div class="tile" data-m="leo"  style="--mc:var(--leo)">
+      <div class="starter">Starter</div>
+      <div class="av">L</div><div class="nm">Leo</div><div class="streak">5-week streak</div><div class="join">Joined</div>
+    </div>
+    <div class="tile" data-m="sam"  style="--mc:var(--sam)">
+      <div class="starter">Starter</div>
+      <div class="av">S</div><div class="nm">Sam</div><div class="streak">5-week streak</div><div class="join">Joined</div>
+    </div>
+  </div>
+
+  <div class="lobby-foot up d5">
+    <div class="join-panel">
+      <div class="qr"><div class="grid" id="qrGrid"></div></div>
+      <div class="join-meta">
+        <div class="k">Join code</div>
+        <div class="code">G<b>R</b>I<b>T</b></div>
+        <div class="scan">Scan or type — no app, no login</div>
+      </div>
+    </div>
+
+    <div class="dial">
+      <div class="k">How much time tonight?</div>
+      <div class="presets">
+        <button class="preset" data-min="20">20<small>min</small></button>
+        <button class="preset sel" data-min="30">30<small>min</small></button>
+        <button class="preset" data-min="45">45<small>min · cap</small></button>
+      </div>
+      <div class="attr" id="dialAttr">Dad set 30 min</div>
+    </div>
+
+    <button class="build" id="buildBtn">Build tonight's session<span class="who" id="buildWho">waiting for someone to join…</span></button>
+  </div>
+</section>
+
+<!-- ============ S2 REVEAL ============ -->
+<section class="beat" data-beat="reveal" id="reveal">
+  <div class="eyebrow up d1">Tonight's session</div>
+  <div class="blocks">
+    <div class="blk"     style="animation-delay:.15s"><div class="tag">Warm-up</div><div class="nm">Movement prep</div><div class="dur">4:00</div></div>
+    <div class="blk key"  style="animation-delay:.45s"><div class="tag">Block A</div><div class="nm">Push ladder</div><div class="flag">Repeats last week — beat your number</div><div class="dur">10:00</div></div>
+    <div class="blk"     style="animation-delay:.75s"><div class="tag">Block B</div><div class="nm">Legs + core circuit</div><div class="flag" style="border-color:color-mix(in srgb,var(--ryan) 40%,transparent);color:var(--ryan)">Ryan's benchmark</div><div class="dur">12:00</div></div>
+    <div class="blk"     style="animation-delay:1.05s"><div class="tag">Finisher</div><div class="nm">Family AMRAP</div><div class="dur">4:00</div></div>
+  </div>
+  <div class="coach reveal-coach up d6"><span class="sig">Coach</span>Tuesday, 30 minutes, all four. Heavy pull Monday — tonight we push and squat.</div>
+  <div class="reveal-total up d7">Total tonight · <b>30:00</b> · under the dial</div>
+</section>
+
+<!-- ============ S3 BLOCK A (focus + live) ============ -->
+<section class="beat" data-beat="blockLive" id="blockLive">
+  <div class="countin" id="countin"><div class="n" id="countinN">3</div></div>
+  <div class="block-wrap">
+    <div class="block-strip">
+      <div class="bname">Block A · Push ladder<small>Round 3 of 4 · logging from four phones</small></div>
+      <div class="timer" id="blkTimer">0:45</div>
+    </div>
+
+    <div class="focus-row up d1">
+      <div class="ex">Push-ups</div>
+      <div class="cue">Chest to the floor. Elbows about 45 degrees. Own the bottom.</div>
+    </div>
+
+    <div class="cols" id="cols">
+      <div class="col" data-m="dad" style="--mc:var(--dad)">
+        <div class="watchtag">Personal best watch</div>
+        <div class="cn"><span class="dot"></span><span class="name">Dad</span></div>
+        <div class="exn">Full push-ups</div>
+        <div class="tgt">target <b>15</b></div>
+        <div class="total" data-final="15">0</div><div class="totlab">logged</div>
+        <div class="matched">Matched best</div>
+        <div class="landed"></div>
+      </div>
+      <div class="col" data-m="ryan" style="--mc:var(--ryan)">
+        <div class="watchtag">Personal best watch</div>
+        <div class="cn"><span class="dot"></span><span class="name">Ryan</span></div>
+        <div class="exn">Full push-ups</div>
+        <div class="tgt">target <b>12</b></div>
+        <div class="total" data-final="12">0</div><div class="totlab">logged</div>
+        <div class="matched">Matched best · 12</div>
+        <div class="landed"></div>
+      </div>
+      <div class="col" data-m="leo" style="--mc:var(--leo)">
+        <div class="cn"><span class="dot"></span><span class="name">Leo</span></div>
+        <div class="exn">Full push-ups <span class="glyph">↗ swapped up</span></div>
+        <div class="tgt private">target on Leo's phone</div>
+        <div class="total" data-final="10">0</div><div class="totlab">logged</div>
+        <div class="landed"></div>
+      </div>
+      <div class="col" data-m="sam" style="--mc:var(--sam)">
+        <div class="cn"><span class="dot"></span><span class="name">Sam</span></div>
+        <div class="exn">Incline push-ups</div>
+        <div class="tgt private">target on Sam's phone</div>
+        <div class="total" data-final="12">0</div><div class="totlab">logged</div>
+        <div class="landed"></div>
+      </div>
+    </div>
+
+    <div class="midcue"><span class="c" id="midCue">Breathe. Two more. That's the whole job.</span></div>
+
+    <div class="upnext">
+      <div class="l">Up next <b>Rest 0:15</b></div>
+      <div class="r">Under-11 targets stay on their phone <b>·</b></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S4 REST ============ -->
+<section class="beat" data-beat="rest" id="rest">
+  <div class="eyebrow up d1">Rest — set up your next round</div>
+  <div class="rest-count" id="restCount">15</div>
+  <div class="rest-next up d3">
+    <div class="rn"><div class="d" style="--mc:var(--dad)"></div><div class="n">Dad</div><div class="x">Full push-ups · 15</div></div>
+    <div class="rn"><div class="d" style="--mc:var(--ryan)"></div><div class="n">Ryan</div><div class="x">Full push-ups · 12</div></div>
+    <div class="rn"><div class="d" style="--mc:var(--leo)"></div><div class="n">Leo</div><div class="x">Full push-ups</div></div>
+    <div class="rn"><div class="d" style="--mc:var(--sam)"></div><div class="n">Sam</div><div class="x">Incline push-ups</div></div>
+  </div>
+  <div class="micropanel up d5">
+    <div class="k">Skill path · Ryan</div>
+    <div class="v">Front lever — tuck holds</div>
+    <div class="step">
+      <i class="on"></i><i class="on"></i><i class="cur"></i><i></i><i></i><i></i><i></i>
+    </div>
+    <div style="margin-top:10px;font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--muted)">Step 3 of 7</div>
+  </div>
+</section>
+
+<!-- ============ FINISHER ============ -->
+<section class="beat" data-beat="finisher" id="finisher">
+  <div class="eyebrow up d1">Finisher · everyone in the pool</div>
+  <div class="fin-name up d2">The Tuesday 150</div>
+  <div class="fin-num"><span id="finNum">0</span><span class="u">reps</span></div>
+  <div class="fin-chips up d4">
+    <div class="chip" style="--mc:var(--dad)"><span class="d"></span><span class="n">Dad</span><span class="c" id="finDad">0</span></div>
+    <div class="chip" style="--mc:var(--ryan)"><span class="d"></span><span class="n">Ryan</span><span class="c" id="finRyan">0</span></div>
+    <div class="chip" style="--mc:var(--leo)"><span class="d"></span><span class="n">Leo</span><span class="c" id="finLeo">0</span></div>
+    <div class="chip" style="--mc:var(--sam)"><span class="d"></span><span class="n">Sam</span><span class="c" id="finSam">0</span></div>
+  </div>
+  <div class="fin-cap up d5">150 reps · tag in and out · 4:00 cap</div>
+</section>
+
+<!-- ============ S5a CLOSE — DONE STAMP ============ -->
+<section class="beat" data-beat="close1" id="close1">
+  <div class="stamp">
+    <div class="eyebrow up d1">Session complete</div>
+    <div class="big up d2" style="margin-top:18px">That's the work.</div>
+    <div class="row">
+      <div class="stat up d3"><div class="v" id="stReps">0</div><div class="k">Family reps</div></div>
+      <div class="stat up d4"><div class="v">29:40</div><div class="k">Work time</div></div>
+      <div class="stat up d5"><div class="v">4 / 4</div><div class="k">Members in</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S5b PB CEREMONY — SAM ============ -->
+<section class="beat" data-beat="pbSam" id="pbSam">
+  <div class="pb-eyebrow up d1">Personal best · into the Record Book</div>
+  <div class="pb-name up d1" style="animation-delay:.18s">Sam</div>
+  <div class="pb-num"><span id="pbNum">12</span> <span class="pb-unit">push-ups</span></div>
+  <div class="pb-prev" id="pbPrev">Best ever was 9<span class="strike"></span></div>
+  <div class="pb-delta up d1" id="pbDelta" style="animation-delay:.9s">+3 · all-time best</div>
+  <div class="chalk" id="pbChalk">
+    <div class="line"></div>
+    <div class="rb">Written into the Family Record Book</div>
+  </div>
+  <div class="coach pb-coach" id="pbCoach">
+    <div class="main">Sam — twelve push-ups. Best ever was nine. The Record Book just changed.</div>
+    <div class="sub">You built it. Nobody gave you that.</div>
+  </div>
+</section>
+
+<!-- ============ S5c PACT ============ -->
+<section class="beat" data-beat="pact" id="pact">
+  <div class="pact-big">
+    <div class="eyebrow up d1">The Pact — this week</div>
+    <svg class="ring2 up d2" viewBox="0 0 120 120" id="pactRing2"></svg>
+    <div class="cap up d4">
+      <div class="n">Session <b>2</b> of 3</div>
+      <div class="s">Two down. One more this week and the Pact is yours.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ S5d TEASE ============ -->
+<section class="beat" data-beat="tease" id="tease">
+  <div class="tease">
+    <div class="eyebrow up d1">Next up</div>
+    <div class="day up d2" style="margin-top:16px">Thursday — we pull.</div>
+    <div class="coach ln up d4"><span class="sig" style="display:block;margin-bottom:.7em">Coach</span>Ryan — your dead-hang benchmark returns. Rest up.</div>
+    <div class="sig up d5">Each phone now shows your own numbers</div>
+    <div class="restart up d6">Prototype walkthrough complete · space to replay</div>
+  </div>
+</section>
+
+<script>
+/* =========================================================
+   Beat controller — space/click advances. Some beats
+   auto-advance where the spec says the clock drives.
+   ========================================================= */
+const order = ['lobby','reveal','blockLive','rest','finisher','close1','pbSam','pact','tease'];
+let idx = 0, timers = [], busy = false;
+
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const T  = (fn,ms)=>{ const id=setTimeout(fn,ms); timers.push(id); return id; };
+const clearTimers = ()=>{ timers.forEach(clearTimeout); timers=[]; };
+
+/* ---------- audio (unlocked by first user gesture) ---------- */
+let actx=null, muted=false;
+function ac(){ if(!actx){ try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){} } return actx; }
+function tone(freq,dur=.12,type='sine',gain=.05){
+  if(muted) return; const c=ac(); if(!c) return;
+  const o=c.createOscillator(), g=c.createGain();
+  o.type=type; o.frequency.value=freq; o.connect(g); g.connect(c.destination);
+  const t=c.currentTime; g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(gain,t+.012);
+  g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+  o.start(t); o.stop(t+dur+.03);
+}
+function chime(){ [523.25,659.25,783.99,1046.5].forEach((f,i)=>T(()=>tone(f,.5,'triangle',.05),i*90)); }
+$('#mute').addEventListener('click',e=>{ e.stopPropagation(); muted=!muted; $('#mute').textContent=muted?'Sound off':'Sound on'; if(!muted) tone(660,.08); });
+
+/* ---------- pact rings ---------- */
+function ringSVG(el, filled, r, sw){
+  const C=2*Math.PI*r, gap=18, arc=C*(120-gap)/360;
+  el.innerHTML='';
+  for(let i=0;i<3;i++){
+    const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    c.setAttribute('cx',60); c.setAttribute('cy',60); c.setAttribute('r',r);
+    c.setAttribute('stroke-width',sw);
+    c.setAttribute('stroke-dasharray', arc+' '+(C-arc));
+    c.setAttribute('transform', `rotate(${i*120 - 90 + gap/2} 60 60)`);
+    c.setAttribute('fill','none'); c.setAttribute('stroke-linecap','round');
+    c.setAttribute('stroke', i<filled ? 'var(--ember)' : 'var(--faint)');
+    if(i<filled) c.style.filter='drop-shadow(0 0 6px rgba(255,122,24,.55))';
+    el.appendChild(c);
+  }
+}
+ringSVG($('#pactRing'),1,45,8);
+
+/* ---------- fake QR ---------- */
+(function(){
+  const g=$('#qrGrid'); const N=11; let s=0;
+  const seed=[13,7,19,3,29,11,23,5,17,31]; // static pseudo-pattern
+  for(let y=0;y<N;y++) for(let x=0;x<N;x++){
+    const i=document.createElement('i');
+    const corner=(x<3&&y<3)||(x>N-4&&y<3)||(x<3&&y>N-4);
+    const inner=((x===0||x===2||x>N-3||y===0||y===2||y>N-3)&&corner);
+    let on = corner ? true : (((x*seed[y%10]+y*seed[x%10])%5)<2);
+    if(corner && !inner && x>0&&x<2 && y>0&&y<2) {}
+    i.className = on?'on':'';
+    g.appendChild(i);
+  }
+})();
+
+/* ---------- helpers ---------- */
+function show(name){ $$('.beat').forEach(b=>b.classList.toggle('active', b.dataset.beat===name)); }
+function tickUp(el,to,ms,fmt){
+  const start=performance.now(), from=parseFloat(el.textContent)||0;
+  function step(now){
+    const p=Math.min(1,(now-start)/ms), e=1-Math.pow(1-p,3);
+    const v=Math.round(from+(to-from)*e);
+    el.textContent = fmt?fmt(v):v;
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+/* ======================= BEAT ENTER HANDLERS ======================= */
+const enters = {
+  lobby(){
+    // reset lobby
+    $$('#roster .tile').forEach(t=>t.classList.remove('joined','starter-on'));
+    $('#dialAttr').classList.remove('show');
+    $('#buildBtn').classList.remove('ready');
+    $('#buildWho').textContent='waiting for someone to join…';
+    const seq=['sam','leo','ryan','dad']; // a kid taps in first (any-member start)
+    seq.forEach((m,i)=>T(()=>{
+      const t=$(`#roster .tile[data-m="${m}"]`); t.classList.add('joined'); tone(392+i*40,.06,'sine',.04);
+      if(i===0){ t.classList.add('starter-on'); $('#buildWho').textContent='Sam can start us — anyone can'; $('#buildBtn').classList.add('ready'); }
+    }, 500+i*520));
+    T(()=>$('#dialAttr').classList.add('show'), 1600);
+  },
+  reveal(){ /* CSS-driven slide-ins */ },
+  blockLive(){
+    // count-in 3-2-1 then live logging
+    const ci=$('#countin'), n=$('#countinN'), timer=$('#blkTimer');
+    $$('#cols .total').forEach(t=>t.textContent='0');
+    $$('#cols .col').forEach(c=>c.classList.remove('watch','flash'));
+    $$('#cols .matched').forEach(m=>m.classList.remove('show'));
+    $('#midCue').classList.remove('show');
+    timer.textContent='0:45'; timer.classList.remove('lo');
+    ci.classList.add('on'); n.textContent='3'; n.classList.remove('go');
+    tone(440,.14);
+    T(()=>{ n.textContent='2'; tone(440,.14); },700);
+    T(()=>{ n.textContent='1'; tone(440,.14); },1400);
+    T(()=>{ n.textContent='GO'; n.classList.add('go'); tone(660,.22,'triangle',.06); },2100);
+    T(()=>{ ci.classList.remove('on'); runBlock(); },2700);
+  },
+  rest(){
+    const el=$('#restCount'); let s=15; el.textContent=s; el.classList.remove('lo');
+    const iv=()=> T(()=>{
+      s--; el.textContent=s;
+      if(s<=5){ el.classList.add('lo'); tone(s===0?660:520,.1); }
+      if(s>0) iv(); else T(()=>next(true),700);
+    },1000);
+    iv();
+  },
+  finisher(){
+    $('#finNum').textContent='0';
+    ['finDad','finRyan','finLeo','finSam'].forEach(id=>$('#'+id).textContent='0');
+    T(()=>{
+      tickUp($('#finNum'),150,3200);
+      tickUp($('#finDad'),46,3200); tickUp($('#finRyan'),41,3200);
+      tickUp($('#finLeo'),35,3200);  tickUp($('#finSam'),28,3200);
+      // little slams
+      for(let i=0;i<8;i++) T(()=>tone(300+i*30,.05,'sine',.03), i*380);
+    },300);
+  },
+  close1(){ T(()=>tickUp($('#stReps'),437,1400),400); },
+  pbSam(){
+    const chalk=$('#pbChalk'), prev=$('#pbPrev'), num=$('#pbNum');
+    chalk.classList.remove('draw'); prev.classList.remove('struck');
+    num.textContent='0';
+    T(()=>{ tickUp(num,12,650); tone(523,.18,'triangle',.05); },250);
+    T(()=>{ prev.classList.add('struck'); tone(392,.16,'triangle',.05); },1100);
+    T(()=>{ chalk.classList.add('draw'); chime(); },1700);
+  },
+  pact(){
+    ringSVG($('#pactRing2'),1,50,9);
+    T(()=>{ ringSVG($('#pactRing2'),2,50,9); tone(523,.3,'triangle',.06);
+            ringSVG($('#pactRing'),2,45,8); $('#pactHdr').textContent='2 of 3 done'; },900);
+  },
+  tease(){ /* static */ }
+};
+
+/* ----- Block A live logging simulation ----- */
+function runBlock(){
+  const timer=$('#blkTimer');
+  let t=45;
+  const tk=()=> T(()=>{
+    t--; const m=Math.floor(t/60), s=t%60;
+    timer.textContent = m+':'+String(s).padStart(2,'0');
+    if(t<=10) timer.classList.add('lo');
+    if(t>0) tk();
+  },1000);
+  tk();
+
+  // phones report reps across the round; totals land on the wall
+  const cols = { dad:$('#cols .col[data-m="dad"]'), ryan:$('#cols .col[data-m="ryan"]'),
+                 leo:$('#cols .col[data-m="leo"]'), sam:$('#cols .col[data-m="sam"]') };
+  const set = (m,v)=>{ const c=cols[m], tot=c.querySelector('.total');
+    tot.textContent=v; c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); tone(520,.05,'sine',.03); };
+
+  // staggered arrivals
+  T(()=>set('leo',10), 900);
+  T(()=>set('dad',15), 1500);
+  T(()=>set('sam',12), 2200);        // Sam's total lands (neutral on wall — his PB is age-gated to close)
+  // Ryan builds into PB Watch (11+, public) then matches best
+  T(()=>{ set('ryan',10); }, 2800);
+  T(()=>{ set('ryan',11); cols.ryan.classList.add('watch'); tone(700,.12,'triangle',.05); }, 3600);
+  T(()=>{ set('ryan',12); cols.ryan.querySelector('.matched').classList.add('show'); }, 4600);
+  // Dad matched-best tag
+  T(()=>cols.dad.querySelector('.matched').classList.add('show'), 4600);
+  // mid-set coach cue
+  T(()=>$('#midCue').classList.add('show'), 3000);
+}
+
+/* ======================= NAVIGATION ======================= */
+function enter(name){ clearTimers(); show(name); (enters[name]||(()=>{}))(); }
+function goto(i){ idx=(i+order.length)%order.length; if(idx===0) enters.lobby(); enter(order[idx]); }
+function next(auto){
+  if(busy) return; busy=true; setTimeout(()=>busy=false, auto?200:360);
+  idx = (idx+1)%order.length;
+  enter(order[idx]);
+}
+
+document.addEventListener('keydown', e=>{
+  if(e.code==='Space' || e.code==='Enter' || e.code==='ArrowRight'){ e.preventDefault(); next(); }
+  else if(e.code==='ArrowLeft'){ e.preventDefault(); idx=(idx-2+order.length)%order.length; next(); }
+});
+document.addEventListener('click', e=>{
+  if(e.target.closest('#mute')) return;
+  if(e.target.closest('.preset')){ // let time dial feel interactive without advancing
+    $$('.preset').forEach(p=>p.classList.remove('sel')); e.target.closest('.preset').classList.add('sel');
+    const who = e.target.closest('.preset').dataset.min; $('#dialAttr').textContent='Dad set '+who+' min'; $('#dialAttr').classList.add('show');
+    return;
+  }
+  next();
+});
+
+/* boot */
+enter('lobby');
+</script>
+</body>
+</html>

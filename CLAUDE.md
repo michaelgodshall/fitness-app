@@ -1,32 +1,14 @@
-# Fitness App — Family Co-Training Coach
+# Fitness App
 
-AI-native family training coach: generated bodyweight co-training sessions for parents + kids (8-14 sweet spot), 45-min hard cap, per-member scaling, deterministic Trials/Challenges/skill standards. Father-son brand wedge; parent-child-generic product. Solo founder (Michael) + AI agents; path-to-primary-business, milestone-gated.
+Software that helps parents and kids train together. The first users are Michael and his sons.
 
-## Session start ritual
-1. Read `docs/00-state-of-the-foundation.md` (the top-down view + confidence map), then `docs/04-build-orientation.md` (session protocol + doc authority map), then `docs/01-product-vision.md`, `docs/02-product-strategy.md`, `docs/03-roadmap.md` — they govern. `PLAN.md` is the locked grill artifact; `PLAN-REVIEW-LOG.md` holds the Codex adversarial review trail.
-   - **Engine docs carry known conflicts (F31-F40 in `docs/design/design-review-findings.md`), arbitration rulings already recorded there.** Do NOT implement engine-data-model.md until the F31/F32 merges are executed per the rulings — that is the next session's first task, ahead of everything else.
-2. Check "Current status" below and the roadmap's "Next 5 working sessions."
-3. `docs/legacy/` is the superseded Oct 2025 plan — reference only, never authority.
+## Status: re-planning since 2026-11-12
 
-## Current status (update this section every session)
-- **Phase 0 — Family Gate** (summer 2026). Foundation locked 2026-07-06 via grill + research swarms + pre-mortem + Codex adversarial review.
-- **ADR-001 RATIFIED:** web-first (one web app = big-screen display + phone controllers via QR/room-code), Convex + Clerk, big-screen-authoritative sync, Expo native deferred to Phase 2. Domain logic must stay in pure-TS packages (reversibility hedge).
-- **Monetization sequenced** (see PLAN §5): free beta → capped paid founding cohort (~$79 founding-year, never "lifetime") → permanent model from own data. Sponsored-family path stays open.
-- **Codex review: APPROVED at round 5/5** (2026-07-06). 35 findings arbitrated across 4 REVISE rounds — full trail in PLAN-REVIEW-LOG.md. The plan is implementation-ready.
-- Design docs complete in `docs/design/` (11 docs incl. engine-data-model, adaptive-engine, library-authoring-pipeline, design-review-findings). Skills doc ends with 7 founder questions. **Naming (see naming.md R2.7 founder pass):** dinner-table five = Grithouse (front-runner, pending "shithouse"-rhyme smirk test with the kids), Kinforge + SquadStrong (domains owned), Strongside/IronPact secondary; Ironside out. **Pending founder decision:** the R2.5 Crucible ruling — rename the Challenge system "The Crucible" (Trials stays Trials); if he approves, apply to trials-and-challenges.md §Challenges 2.0.
-- **Design-layer adversarial review complete** (docs/design/design-review-findings.md): 30 findings; Criticals + fast Highs fixed in-session (incl. the new Pact spec and async-slice contract in session-planner-spec.md); the findings doc's "REMAINING for next session" list is the next session's first task, and its §Founder questions (18 decisions) is Michael's homework.
-- **Engine fully designed:** docs/design/engine-data-model.md (types, session state machine, event-sourced logging, invariants) + docs/design/adaptive-engine.md (capability state, target formula, advancement triggers, anti-sandbagging) landed and committed. Next-session task: fold adaptive-engine §9 and skill-progressions' planner-spec deltas into session-planner-spec.md (same pattern as findings F9).
-- Git initialized 2026-07-06 (root commit 9dde436). Nothing built yet. First build target: engine data model + walking skeleton, honoring the week-2 paper-session kill-switch (PLAN §Approach-2).
+- The project was reset on 2026-11-12. Nothing is being built yet.
+- `archive/2026-07/` holds the previous plans, design docs, glossary and explorations. They are prior art: a source of ideas with no authority. Do not treat anything there as a requirement or a decision, and do not implement from it.
+- Decisions are being re-made one at a time with Michael and recorded in a decision ledger kept by Fitness Captain in Capy Drive (captain-fitness-captain/plans/decision-ledger.md). A copy lands in this repo at each planning stage gate. If a decision is not in the ledger, it has not been made.
 
-## Hard rules
-- **Gates are numeric and don't move** (see roadmap). Missed gate → diagnose and fix, never advance.
-- **Fences hold through Phase 2** (see roadmap out-of-scope list). Scope creep must argue against the doc, in the doc.
-- **No runtime LLM in the workout loop in v1.** Deterministic planner over a founder-reviewed library; LLM only at authoring time (founder reviews every batch) + coach voice.
-- **45-minute cap is inviolable.** Bodyweight-pure v1 (pull-up bar OK). No gender in the data model.
-- **COPPA:** under-13s are parent-owned sub-profiles (nickname + birth year only, no login, verifiable consent).
-- Kebab-case filenames. Decisions get a row in `docs/decisions/decision-log.md` the day they're made (ADRs only for hard-to-reverse + surprising + real-trade-off). **`GLOSSARY.md` (repo root) is the ubiquitous language — specs must use its terms; when a doc and GLOSSARY.md disagree, fix the doc.** Future plan-hardening sessions use grill-with-docs-codex (not plain grill-me-codex) so both stay current inline.
+## Rules
 
-## Founder context
-- 8-10 protected hrs/week; client work is primary income. Agents execute between founder sessions; founder does judgment, content review, family testing, community.
-- Backend leanings: positive Convex + Clerk/WorkOS experience; unenthusiastic about Supabase. Big-screen usage is real: family trains with a laptop/32" monitor as shared display — the big-screen + phones-as-controllers hypothesis is live until the platform ADR settles it.
-- The founder's family is validation gate #1. If a change would make Tuesday night training worse, it's wrong.
+- Do not start build work until the ledger records that Michael approved the plan.
+- Never commit secrets.

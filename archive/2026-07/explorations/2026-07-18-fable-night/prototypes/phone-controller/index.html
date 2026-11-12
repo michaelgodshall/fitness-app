@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Phone Controller — Prototype (Ryan, 14)</title>
+<style>
+  /* ============================================================
+     PHONE CONTROLLER — exploration prototype (2026-07-18 Fable night)
+     Governing spec: docs/design/workout-experience.md §2 + CONTEXT.md
+     NOT a decision. Premium athletic direction; instrument-panel
+     numerals + clean sans. Self-contained, zero external requests.
+     ============================================================ */
+
+  :root{
+    --bg:#0b0c0f;
+    --bg-2:#101216;
+    --card:#16181e;
+    --card-2:#1c1f27;
+    --line:#252932;
+    --line-2:#30343f;
+    --ink:#f3f4f7;
+    --ink-2:#a7adba;
+    --ink-3:#6b7180;
+    /* Ryan's member color — ember/torch */
+    --me:#ff5e3a;
+    --me-2:#ffa638;
+    --me-soft:rgba(255,94,58,.14);
+    --good:#3fd7a2;
+    --good-soft:rgba(63,215,162,.14);
+    --warn:#ffb020;
+    --steel:#5b8dd6;   /* Dad */
+    --moss:#57c98a;    /* Leo */
+    --violet:#a98cff;  /* Sam */
+    --mono:"SF Mono",ui-monospace,"Menlo","Consolas",monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Helvetica,Arial,sans-serif;
+    --r:18px;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{
+    font-family:var(--sans);
+    color:var(--ink);
+    background:
+      radial-gradient(1100px 700px at 18% -10%, #1a1410 0%, transparent 55%),
+      radial-gradient(900px 900px at 110% 20%, #0d1620 0%, transparent 60%),
+      var(--bg);
+    display:flex;align-items:center;justify-content:center;
+    min-height:100dvh;padding:24px 16px;
+    overflow-x:hidden;
+  }
+
+  /* ---- phone chrome ------------------------------------------------ */
+  .stage{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .phone{
+    position:relative;width:390px;max-width:100%;height:844px;max-height:92dvh;
+    background:#000;border-radius:52px;
+    padding:11px;
+    box-shadow:0 0 0 2px #23262e, 0 40px 90px -20px rgba(0,0,0,.85), inset 0 0 0 1px #000;
+  }
+  .glass{
+    position:relative;width:100%;height:100%;overflow:hidden;
+    border-radius:42px;background:var(--bg);
+    display:flex;flex-direction:column;
+  }
+  .island{
+    position:absolute;top:9px;left:50%;transform:translateX(-50%);
+    width:112px;height:31px;background:#000;border-radius:20px;z-index:60;
+  }
+  .statusbar{
+    height:52px;flex:0 0 auto;display:flex;align-items:flex-end;
+    justify-content:space-between;padding:0 26px 7px;font-size:14px;font-weight:600;
+    letter-spacing:.2px;color:var(--ink);z-index:5;
+  }
+  .statusbar .dots{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--ink-2)}
+  .sync-pill{
+    display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:700;
+    letter-spacing:.6px;text-transform:uppercase;color:var(--good);
+    background:var(--good-soft);padding:3px 8px;border-radius:20px;
+  }
+  .sync-pill.pending{color:var(--warn);background:rgba(255,176,32,.14)}
+  .sync-pill .tick{width:6px;height:6px;border-radius:50%;background:currentColor}
+  .sync-pill.pending .tick{animation:pulse 1s infinite}
+
+  .viewport{flex:1 1 auto;overflow-y:auto;overflow-x:hidden;position:relative}
+  .viewport::-webkit-scrollbar{width:0}
+
+  /* screens */
+  .screen{display:none;flex-direction:column;min-height:100%;padding:8px 22px 30px}
+  .screen.active{display:flex;animation:rise .32s cubic-bezier(.2,.7,.2,1)}
+  @keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+  @keyframes tick-in{from{opacity:0;transform:scale(.6)}to{opacity:1;transform:none}}
+
+  /* typography helpers */
+  .kicker{font-size:11px;font-weight:700;letter-spacing:2.4px;text-transform:uppercase;color:var(--ink-3)}
+  .num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+  h1{font-size:26px;font-weight:750;letter-spacing:-.4px;line-height:1.08}
+  .sub{color:var(--ink-2);font-size:14px;line-height:1.45}
+
+  /* ---- JOIN: room code -------------------------------------------- */
+  .center-col{flex:1;display:flex;flex-direction:column;justify-content:center;gap:22px}
+  .brandmark{display:flex;align-items:center;gap:10px}
+  .brandmark .spark{width:26px;height:26px;border-radius:8px;
+    background:linear-gradient(150deg,var(--me),var(--me-2));
+    box-shadow:0 6px 20px -6px var(--me);}
+  .brandmark span{font-weight:750;letter-spacing:.4px;font-size:15px}
+  .brandmark small{color:var(--ink-3);font-weight:600;font-size:11px;letter-spacing:.4px;text-transform:uppercase}
+
+  .code-boxes{display:flex;gap:10px;margin-top:4px}
+  .code-boxes input{
+    width:100%;aspect-ratio:1/1.15;background:var(--card);border:1.5px solid var(--line);
+    border-radius:16px;text-align:center;font-family:var(--mono);font-size:34px;font-weight:600;
+    color:var(--ink);text-transform:uppercase;caret-color:var(--me);transition:.18s;
+  }
+  .code-boxes input:focus{outline:none;border-color:var(--me);background:var(--card-2);
+    box-shadow:0 0 0 4px var(--me-soft)}
+  .code-boxes input.filled{border-color:var(--line-2)}
+  .qr-hint{display:flex;align-items:center;gap:12px;color:var(--ink-3);font-size:12.5px;margin-top:2px}
+  .qr-hint .qr{width:38px;height:38px;border-radius:8px;flex:0 0 auto;
+    background:
+      conic-gradient(from 0deg,#2a2e37 0 25%,#1a1d24 0 50%,#2a2e37 0 75%,#1a1d24 0);
+    background-size:10px 10px;border:1px solid var(--line);}
+
+  /* buttons */
+  .btn{
+    width:100%;border:none;border-radius:16px;font-family:var(--sans);font-size:16px;
+    font-weight:700;letter-spacing:.2px;padding:18px;cursor:pointer;transition:.16s;color:#fff;
+  }
+  .btn:active{transform:scale(.98)}
+  .btn.primary{background:linear-gradient(135deg,var(--me),#ff7a45);
+    box-shadow:0 12px 28px -12px var(--me),inset 0 1px 0 rgba(255,255,255,.25)}
+  .btn.primary:disabled{background:var(--card-2);color:var(--ink-3);box-shadow:none;cursor:default}
+  .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+  .btn.big{padding:22px;font-size:17px;letter-spacing:.4px;text-transform:uppercase}
+
+  /* ---- pick member ------------------------------------------------ */
+  .members{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+  .m-tile{
+    display:flex;align-items:center;gap:14px;background:var(--card);border:1.5px solid var(--line);
+    border-radius:16px;padding:14px 16px;cursor:pointer;transition:.16s;text-align:left;width:100%;
+    color:var(--ink);font-family:var(--sans);
+  }
+  .m-tile:active{transform:scale(.99)}
+  .m-tile.sel{border-color:var(--me);background:var(--me-soft)}
+  .m-tile.taken{opacity:.5}
+  .avatar{width:46px;height:46px;border-radius:13px;flex:0 0 auto;display:flex;align-items:center;
+    justify-content:center;font-weight:800;font-size:19px;color:#0b0c0f;font-family:var(--mono)}
+  .m-name{font-weight:700;font-size:16.5px;display:flex;align-items:center;gap:8px}
+  .m-meta{font-size:12px;color:var(--ink-3);margin-top:2px;letter-spacing:.2px}
+  .m-tag{font-size:10px;font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+    padding:2px 7px;border-radius:20px;background:var(--card-2);color:var(--ink-2)}
+  .m-tag.you{background:var(--me);color:#0b0c0f}
+  .m-tag.in{background:var(--good-soft);color:var(--good)}
+
+  /* ---- lobby ------------------------------------------------------ */
+  .pact{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);
+    border-radius:16px;padding:14px 16px}
+  .ring{width:52px;height:52px;flex:0 0 auto;border-radius:50%;
+    background:conic-gradient(var(--good) 0 240deg,var(--line-2) 0);
+    display:flex;align-items:center;justify-content:center;position:relative}
+  .ring::after{content:"";position:absolute;inset:6px;border-radius:50%;background:var(--card)}
+  .ring b{position:relative;z-index:1;font-family:var(--mono);font-size:13px;font-weight:600}
+  .roster-row{display:flex;gap:8px;margin-top:2px;flex-wrap:wrap}
+  .chip{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);
+    border-radius:20px;padding:6px 12px 6px 7px;font-size:13px;font-weight:600}
+  .chip .dot{width:22px;height:22px;border-radius:7px;font-family:var(--mono);font-size:11px;font-weight:800;
+    color:#0b0c0f;display:flex;align-items:center;justify-content:center}
+  .chip.out{opacity:.45}
+  .chip.out .status{color:var(--ink-3);font-weight:500}
+  .chip .status{font-size:11px;color:var(--good)}
+  .dial{display:flex;align-items:center;justify-content:space-between;background:var(--card);
+    border:1px solid var(--line);border-radius:16px;padding:16px}
+  .dial .val{font-family:var(--mono);font-size:30px;font-weight:600}
+  .dial .by{font-size:11px;color:var(--ink-3);margin-top:2px}
+  .waiting{display:flex;align-items:center;gap:9px;justify-content:center;color:var(--ink-2);
+    font-size:13px;padding:6px}
+  .waiting .d{width:7px;height:7px;border-radius:50%;background:var(--me);animation:pulse 1.2s infinite}
+
+  /* ---- session / block view -------------------------------------- */
+  .blockbar{display:flex;align-items:center;justify-content:space-between;
+    padding:10px 0 12px;border-bottom:1px solid var(--line)}
+  .blockbar .bl{display:flex;flex-direction:column;gap:3px}
+  .blockbar .clock{font-family:var(--mono);font-size:15px;font-weight:600;color:var(--ink-2)}
+  .exercise-head{margin-top:20px}
+  .rung-tag{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;
+    letter-spacing:.6px;text-transform:uppercase;color:var(--me);background:var(--me-soft);
+    padding:5px 10px;border-radius:20px}
+  .exercise-head h1{margin-top:10px;font-size:30px}
+  .cue{color:var(--ink-2);font-size:14px;margin-top:8px;line-height:1.4}
+  .bench-flag{display:flex;align-items:center;gap:9px;margin-top:14px;padding:11px 13px;
+    border-radius:13px;background:linear-gradient(120deg,rgba(255,94,58,.12),rgba(255,166,56,.08));
+    border:1px solid rgba(255,94,58,.28);font-size:13px;color:var(--me-2);font-weight:600}
+  .bench-flag .flag{font-family:var(--mono)}
+
+  /* stepper — sized for sweaty thumbs */
+  .stepper{margin-top:26px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+  .step-btn{width:84px;height:84px;flex:0 0 auto;border-radius:26px;border:1.5px solid var(--line-2);
+    background:var(--card-2);color:var(--ink);font-size:40px;font-weight:300;line-height:1;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.12s;
+    user-select:none}
+  .step-btn:active{transform:scale(.92);background:var(--me);border-color:var(--me);color:#0b0c0f}
+  .count{flex:1;text-align:center}
+  .count .n{font-family:var(--mono);font-size:76px;font-weight:600;line-height:.9;letter-spacing:-.04em}
+  .count .u{display:block;font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-3);
+    margin-top:8px;font-weight:700}
+  .count .n.pb{color:var(--me)}
+  .target-note{text-align:center;font-size:12.5px;color:var(--ink-3);margin-top:16px}
+  .target-note b{color:var(--ink-2);font-family:var(--mono)}
+
+  .action-row{margin-top:auto;padding-top:22px;display:flex;flex-direction:column;gap:10px}
+  .swap-row{display:flex;gap:10px}
+  .swap-btn{flex:1;background:var(--card);border:1px solid var(--line);color:var(--ink-2);
+    border-radius:14px;padding:14px;font-weight:700;font-size:13.5px;font-family:var(--sans);
+    cursor:pointer;transition:.14s;display:flex;flex-direction:column;align-items:center;gap:2px}
+  .swap-btn:active{transform:scale(.98);border-color:var(--line-2)}
+  .swap-btn small{font-size:10px;color:var(--ink-3);font-weight:600;letter-spacing:.3px}
+  .swap-btn:disabled{opacity:.4;cursor:default}
+
+  /* tonight log strip on block screen */
+  .tonight{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
+  .tonight .lbl{display:flex;justify-content:space-between;align-items:center}
+  .log-list{display:flex;flex-direction:column;gap:7px;margin-top:10px}
+  .log-item{display:flex;align-items:center;gap:10px;font-size:13px}
+  .log-item .lx{flex:1;color:var(--ink-2)}
+  .log-item .lv{font-family:var(--mono);font-weight:600}
+  .log-item .ls{font-size:10px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;
+    display:inline-flex;align-items:center;gap:4px}
+  .log-item .ls.synced{color:var(--good)}
+  .log-item .ls.pending{color:var(--warn)}
+  .log-item .ls .d{width:6px;height:6px;border-radius:50%;background:currentColor}
+  .log-item .ls.pending .d{animation:pulse 1s infinite}
+
+  /* ---- sheets (effort, swap, rest) -------------------------------- */
+  .scrim{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:40;opacity:0;
+    pointer-events:none;transition:.22s;backdrop-filter:blur(2px)}
+  .scrim.show{opacity:1;pointer-events:auto}
+  .sheet{position:absolute;left:0;right:0;bottom:0;z-index:50;background:var(--bg-2);
+    border-top:1px solid var(--line-2);border-radius:26px 26px 0 0;padding:12px 22px 26px;
+    transform:translateY(110%);transition:.3s cubic-bezier(.2,.8,.2,1);
+    box-shadow:0 -20px 50px -10px rgba(0,0,0,.6)}
+  .sheet.up{transform:translateY(0)}
+  .grab{width:38px;height:4px;border-radius:4px;background:var(--line-2);margin:2px auto 16px}
+  .sheet h2{font-size:19px;font-weight:750;letter-spacing:-.2px}
+  .sheet .sh-sub{color:var(--ink-3);font-size:13px;margin-top:5px}
+
+  .effort-opts{display:flex;gap:10px;margin-top:20px}
+  .eff{flex:1;background:var(--card);border:1.5px solid var(--line);border-radius:16px;
+    padding:18px 8px;cursor:pointer;transition:.15s;text-align:center;color:var(--ink)}
+  .eff:active{transform:scale(.97)}
+  .eff .ei{font-size:22px;margin-bottom:8px;font-family:var(--mono);font-weight:600}
+  .eff .et{font-weight:700;font-size:14px}
+  .eff.easy .ei{color:var(--good)} .eff.right .ei{color:var(--me-2)} .eff.hard .ei{color:var(--warn)}
+  .eff.sel{border-color:var(--me);background:var(--me-soft)}
+  .coppa-note{font-size:11px;color:var(--ink-3);text-align:center;margin-top:16px;line-height:1.4}
+
+  /* swap options */
+  .swap-opts{display:flex;flex-direction:column;gap:10px;margin-top:18px}
+  .swap-opt{display:flex;align-items:center;gap:13px;background:var(--card);border:1.5px solid var(--line);
+    border-radius:15px;padding:15px;cursor:pointer;transition:.15s;text-align:left;width:100%;color:var(--ink)}
+  .swap-opt:active{transform:scale(.99);border-color:var(--me)}
+  .swap-opt .dir{width:40px;height:40px;border-radius:11px;flex:0 0 auto;display:flex;align-items:center;
+    justify-content:center;font-family:var(--mono);font-weight:800;font-size:16px}
+  .swap-opt .dir.down{background:var(--good-soft);color:var(--good)}
+  .swap-opt .dir.same{background:var(--card-2);color:var(--ink-2)}
+  .swap-opt .dir.up{background:var(--me-soft);color:var(--me)}
+  .swap-opt .so-n{display:block;font-weight:700;font-size:15px}
+  .swap-opt .so-m{display:block;font-size:11.5px;color:var(--ink-3);margin-top:3px}
+
+  /* rest */
+  .rest-sheet{text-align:center}
+  .rest-ring{width:150px;height:150px;margin:8px auto 4px;border-radius:50%;position:relative;
+    display:flex;align-items:center;justify-content:center;
+    background:conic-gradient(var(--me) var(--deg,360deg),var(--line) 0)}
+  .rest-ring::after{content:"";position:absolute;inset:11px;border-radius:50%;background:var(--bg-2)}
+  .rest-ring .rn{position:relative;z-index:1;font-family:var(--mono);font-size:46px;font-weight:600}
+  .rest-next{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;
+    margin-top:12px;text-align:left;display:flex;align-items:center;justify-content:space-between}
+  .rest-next .rl{font-size:11px;color:var(--ink-3);letter-spacing:1px;text-transform:uppercase;font-weight:700}
+  .rest-next .rx{font-weight:700;margin-top:3px}
+  .rest-next .rt{font-family:var(--mono);font-size:22px;font-weight:600;color:var(--me-2)}
+
+  /* toast */
+  .toast{position:absolute;left:22px;right:22px;bottom:24px;z-index:70;background:#20242d;
+    border:1px solid var(--line-2);border-radius:14px;padding:13px 16px;font-size:13.5px;font-weight:600;
+    display:flex;align-items:center;gap:10px;transform:translateY(160%);transition:.32s cubic-bezier(.2,.8,.2,1);
+    box-shadow:0 14px 34px -10px rgba(0,0,0,.6)}
+  .toast.show{transform:translateY(0)}
+  .toast .ti{width:8px;height:8px;border-radius:50%;background:var(--me);flex:0 0 auto}
+
+  /* ---- done ------------------------------------------------------- */
+  .done-hero{text-align:center;padding:16px 0 8px}
+  .done-hero .stamp{font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;
+    color:var(--good)}
+  .done-hero h1{margin-top:12px;font-size:30px}
+  .total-card{background:linear-gradient(140deg,var(--card-2),var(--card));border:1px solid var(--line);
+    border-radius:18px;padding:20px;margin-top:20px;text-align:center}
+  .total-card .tn{font-family:var(--mono);font-size:60px;font-weight:600;line-height:1;
+    background:linear-gradient(135deg,var(--me),var(--me-2));-webkit-background-clip:text;
+    background-clip:text;-webkit-text-fill-color:transparent}
+  .total-card .tl{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--ink-3);
+    font-weight:700;margin-top:8px}
+  .summary{display:flex;flex-direction:column;gap:1px;margin-top:16px;border:1px solid var(--line);
+    border-radius:14px;overflow:hidden}
+  .sum-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;
+    background:var(--card)}
+  .sum-row .sx{font-size:14px;font-weight:600}
+  .sum-row .sm{font-size:11px;color:var(--ink-3);margin-top:2px}
+  .sum-row .sv{font-family:var(--mono);font-size:18px;font-weight:600}
+  .sum-row.pb{background:linear-gradient(120deg,rgba(255,94,58,.12),transparent)}
+  .sum-row.pb .sv{color:var(--me)}
+  .pb-badge{font-size:9px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#0b0c0f;
+    background:var(--me);padding:2px 6px;border-radius:6px;margin-left:8px;vertical-align:middle}
+  .coach{margin-top:22px;padding:18px;border-radius:16px;background:var(--card);
+    border:1px solid var(--line);position:relative}
+  .coach::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:3px;border-radius:3px;
+    background:linear-gradient(var(--me),var(--me-2))}
+  .coach .cl{font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--ink-3);
+    padding-left:12px}
+  .coach .ct{font-size:15.5px;line-height:1.5;margin-top:8px;padding-left:12px;color:var(--ink)}
+  .book-note{display:flex;align-items:center;gap:9px;margin-top:14px;font-size:12.5px;color:var(--good);
+    justify-content:center}
+
+  .footnote{text-align:center;color:#3d434e;font-size:11px;letter-spacing:.3px;line-height:1.5}
+  .footnote a{color:#5a616e}
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="phone">
+      <div class="island"></div>
+      <div class="glass">
+        <div class="statusbar">
+          <span class="num">8:14</span>
+          <span class="dots">
+            <span id="syncPill" class="sync-pill" style="display:none"><span class="tick"></span><span id="syncLabel">Synced</span></span>
+            <span>5G</span><span>􀛨</span>
+          </span>
+        </div>
+
+        <div class="viewport" id="viewport">
+
+          <!-- ========== 1. JOIN: room code ========== -->
+          <section class="screen active" data-screen="code">
+            <div class="center-col">
+              <div class="brandmark">
+                <div class="spark"></div>
+                <div>
+                  <span>Controller</span><br><small>Join tonight's session</small>
+                </div>
+              </div>
+              <div>
+                <div class="kicker">Room code</div>
+                <div class="code-boxes" id="codeBoxes">
+                  <input maxlength="1" data-i="0" inputmode="text" autocomplete="off">
+                  <input maxlength="1" data-i="1" inputmode="text" autocomplete="off">
+                  <input maxlength="1" data-i="2" inputmode="text" autocomplete="off">
+                  <input maxlength="1" data-i="3" inputmode="text" autocomplete="off">
+                </div>
+                <div class="qr-hint">
+                  <div class="qr"></div>
+                  <div>Or scan the QR on the big screen. No account, no install — you're in for tonight only.</div>
+                </div>
+              </div>
+              <button class="btn primary" id="joinBtn" disabled>Join</button>
+              <div class="footnote">Prefilled with <b style="color:#6b7180">GRIT</b> for the demo — tap Join.</div>
+            </div>
+          </section>
+
+          <!-- ========== 2. PICK MEMBER ========== -->
+          <section class="screen" data-screen="pick">
+            <div style="padding-top:14px">
+              <div class="kicker">Room GRIT · Push Day</div>
+              <h1 style="margin-top:10px">Who are you?</h1>
+              <p class="sub" style="margin-top:6px">Pick your tile. It lights up on the big screen.</p>
+            </div>
+            <div class="members" id="memberList"></div>
+            <div class="action-row">
+              <button class="btn primary" id="pickBtn" disabled>Continue</button>
+            </div>
+          </section>
+
+          <!-- ========== 3. LOBBY / READY ========== -->
+          <section class="screen" data-screen="lobby">
+            <div style="padding-top:14px">
+              <div class="kicker">Tuesday · Push Day</div>
+              <h1 style="margin-top:10px">You're in, Ryan.</h1>
+            </div>
+
+            <div class="pact" style="margin-top:20px">
+              <div class="ring"><b>2/3</b></div>
+              <div>
+                <div style="font-weight:700;font-size:15px">Session 2 of 3 this week</div>
+                <div class="sub" style="font-size:12.5px;margin-top:3px">Showing up advances the family ring.</div>
+              </div>
+            </div>
+
+            <div style="margin-top:18px">
+              <div class="kicker" style="margin-bottom:10px">In the room</div>
+              <div class="roster-row" id="lobbyRoster"></div>
+            </div>
+
+            <div class="dial" style="margin-top:18px">
+              <div>
+                <div class="kicker">Time dial</div>
+                <div class="val num">30<span style="font-size:15px;color:var(--ink-3)"> min</span></div>
+                <div class="by">Dad set 30 · 45 is the ceiling, always</div>
+              </div>
+              <div style="text-align:right">
+                <div class="kicker">Block 3</div>
+                <div style="font-weight:700;font-size:13px;margin-top:6px;color:var(--me-2)">Your benchmark</div>
+              </div>
+            </div>
+
+            <div class="action-row">
+              <div class="waiting"><span class="d"></span> Mirrors the big screen — anyone can start</div>
+              <button class="btn primary big" id="startBtn">Everyone in — Start</button>
+            </div>
+          </section>
+
+          <!-- ========== 4. SESSION / BLOCK VIEW ========== -->
+          <section class="screen" data-screen="session">
+            <div class="blockbar">
+              <div class="bl">
+                <span class="kicker" id="blockKicker">Block A · Push Ladder</span>
+                <span style="font-size:12px;color:var(--ink-3);font-weight:600" id="setLabel">Set 1 of 2</span>
+              </div>
+              <span class="clock num" id="sessClock">04:12</span>
+            </div>
+
+            <div class="exercise-head">
+              <span class="rung-tag" id="rungTag">◆ Your rung · Full push-up</span>
+              <h1 id="exName">Push-ups</h1>
+              <p class="cue" id="exCue">Chest to floor, elbows ~45°.</p>
+              <div class="bench-flag" id="benchFlag" style="display:none">
+                <span class="flag">⚑</span><span id="benchText">Benchmark — beat last Tuesday: 18</span>
+              </div>
+            </div>
+
+            <div class="stepper">
+              <div class="step-btn" id="minus">−</div>
+              <div class="count">
+                <div class="n num" id="repCount">12</div>
+                <span class="u" id="repUnit">reps</span>
+              </div>
+              <div class="step-btn" id="plus">+</div>
+            </div>
+            <div class="target-note">Prefilled with your target <b id="targetTxt">12</b> — one tap logs it exactly.</div>
+
+            <div class="swap-row" style="margin-top:22px">
+              <button class="swap-btn" id="tooHard"><span>Too hard</span><small>ease the rung ↓</small></button>
+              <button class="swap-btn" id="tooEasy"><span>Too easy</span><small>step it up ↑</small></button>
+            </div>
+
+            <div class="tonight" id="tonightWrap" style="display:none">
+              <div class="lbl"><span class="kicker">Tonight</span><span style="font-size:11px;color:var(--ink-3)" id="tonightTotal"></span></div>
+              <div class="log-list" id="logList"></div>
+            </div>
+
+            <div class="action-row">
+              <button class="btn primary big" id="logBtn">Log set</button>
+            </div>
+          </section>
+
+          <!-- ========== 6. DONE ========== -->
+          <section class="screen" data-screen="done">
+            <div class="done-hero">
+              <div class="stamp">Session complete</div>
+              <h1>Good work tonight.</h1>
+            </div>
+            <div class="total-card">
+              <div class="tn num" id="grandTotal">0</div>
+              <div class="tl">Total reps logged</div>
+            </div>
+            <div class="summary" id="doneSummary"></div>
+            <div class="coach">
+              <div class="cl">The coach</div>
+              <div class="ct" id="coachLine"></div>
+            </div>
+            <div class="book-note" id="bookNote" style="display:none">
+              <span>✓</span> Your squat PB is chalking into the Record Book on the big screen.
+            </div>
+            <div class="footnote" style="margin-top:24px">
+              Prototype — the family moment (PBs, Pact, Chalking) plays on the big screen; this is your personal lens.
+            </div>
+          </section>
+
+        </div><!-- /viewport -->
+
+        <!-- overlays -->
+        <div class="scrim" id="scrim"></div>
+
+        <!-- effort sheet -->
+        <div class="sheet" id="effortSheet">
+          <div class="grab"></div>
+          <h2>That set — how'd it land?</h2>
+          <div class="sh-sub">One tap. It tunes tomorrow's targets, not tonight's.</div>
+          <div class="effort-opts">
+            <button class="eff easy" data-eff="easy"><div class="ei">◦</div><div class="et">Easy</div></button>
+            <button class="eff right" data-eff="right"><div class="ei">●</div><div class="et">Right</div></button>
+            <button class="eff hard" data-eff="hard"><div class="ei">▲</div><div class="et">Too much</div></button>
+          </div>
+          <div class="coppa-note">The only thing we ask you to type is nothing at all.<br>Three buttons — no free text, by design.</div>
+        </div>
+
+        <!-- swap sheet -->
+        <div class="sheet" id="swapSheet">
+          <div class="grab"></div>
+          <h2 id="swapTitle">Swap the movement</h2>
+          <div class="sh-sub">Along the push-up chain. Applies from your next set — the room never sees "easier."</div>
+          <div class="swap-opts" id="swapOpts"></div>
+        </div>
+
+        <!-- rest sheet -->
+        <div class="sheet rest-sheet" id="restSheet">
+          <div class="grab"></div>
+          <div class="kicker" style="margin-top:4px">Rest</div>
+          <div class="rest-ring" id="restRing"><span class="rn num" id="restNum">45</span></div>
+          <div class="rest-next">
+            <div>
+              <div class="rl">Up next</div>
+              <div class="rx" id="restNextName">Push-ups</div>
+            </div>
+            <div style="text-align:right">
+              <div class="rl">Target</div>
+              <div class="rt num" id="restNextTarget">12</div>
+            </div>
+          </div>
+          <button class="btn ghost" id="skipRest" style="margin-top:14px">Skip rest — I'm ready</button>
+        </div>
+
+        <div class="toast" id="toast"><span class="ti"></span><span id="toastMsg"></span></div>
+
+      </div><!-- /glass -->
+    </div><!-- /phone -->
+    <div class="footnote">Phone controller · exploration prototype · 2026-07-18 Fable night · not a decision</div>
+  </div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------- fake data ------------------------------------------- */
+  var MEMBERS = [
+    {id:"dad", name:"Dad", age:42, color:"var(--steel)", state:"in"},
+    {id:"ryan", name:"Ryan", age:14, color:"var(--me)", state:"you"},
+    {id:"leo", name:"Leo", age:10, color:"var(--moss)", state:"in-proxy"},
+    {id:"sam", name:"Sam", age:8, color:"var(--violet)", state:"out"}
+  ];
+
+  // Ryan's push-up swap chain (CONTEXT.md: swap chain = easiest→hardest ladder)
+  var PUSH_CHAIN = ["Knee push-up","Incline push-up","Full push-up","Decline push-up","Archer push-up"];
+
+  // Ryan's track through tonight's session (his rung / his targets)
+  var SETS = [
+    {block:"Block A · Push Ladder", setLabel:"Set 1 of 2", ex:"Push-ups", chainIdx:2,
+     cue:"Chest to floor, elbows ~45°.", target:12, unit:"reps", swappable:true, firstEffort:true},
+    {block:"Block A · Push Ladder", setLabel:"Set 2 of 2", ex:"Push-ups", chainIdx:2,
+     cue:"Same tempo. Don't let the last three get sloppy.", target:12, unit:"reps", swappable:true},
+    {block:"Block B · Legs + Core", setLabel:"Squat benchmark", ex:"Bodyweight squats",
+     cue:"Hips below knees, chest tall.", target:20, unit:"reps", swappable:false,
+     benchmark:true, prevBest:18},
+    {block:"Block B · Legs + Core", setLabel:"Core finisher", ex:"Hollow hold",
+     cue:"Low back pinned to the floor. Arms overhead.", target:30, unit:"sec", swappable:false}
+  ];
+
+  /* ---------- state ----------------------------------------------- */
+  var S = { screen:"code", setIdx:0, count:0, logged:[], effort:null };
+  var restTimer=null, clockTimer=null, clockSec=252; // 04:12
+
+  /* ---------- helpers ---------------------------------------------- */
+  var $=function(s,r){return (r||document).querySelector(s)};
+  var $$=function(s,r){return Array.prototype.slice.call((r||document).querySelectorAll(s))};
+
+  function show(name){
+    S.screen=name;
+    $$(".screen").forEach(function(el){el.classList.toggle("active", el.dataset.screen===name)});
+    $("#viewport").scrollTop=0;
+  }
+  function toast(msg){
+    $("#toastMsg").textContent=msg; var t=$("#toast");
+    t.classList.add("show"); clearTimeout(toast._t);
+    toast._t=setTimeout(function(){t.classList.remove("show")},2400);
+  }
+  function openSheet(id){ $("#scrim").classList.add("show"); $("#"+id).classList.add("up"); }
+  function closeSheets(){
+    $("#scrim").classList.remove("show");
+    ["effortSheet","swapSheet","restSheet"].forEach(function(i){$("#"+i).classList.remove("up")});
+  }
+  function setSync(state){ // 'pending' | 'synced' | hide
+    var p=$("#syncPill");
+    if(!state){p.style.display="none";return;}
+    p.style.display="inline-flex";
+    p.classList.toggle("pending", state==="pending");
+    $("#syncLabel").textContent = state==="pending" ? "Syncing" : "Synced";
+  }
+
+  /* ---------- 1. room code ---------------------------------------- */
+  var inputs=$$("#codeBoxes input");
+  inputs[0].value="G";inputs[1].value="R";inputs[2].value="I";inputs[3].value="T";
+  function refreshCode(){
+    var full=inputs.every(function(i){return i.value.trim().length===1});
+    inputs.forEach(function(i){i.classList.toggle("filled", i.value.length===1)});
+    $("#joinBtn").disabled=!full;
+  }
+  inputs.forEach(function(inp){
+    inp.addEventListener("input",function(){
+      this.value=this.value.toUpperCase();
+      var i=+this.dataset.i;
+      if(this.value && i<3) inputs[i+1].focus();
+      refreshCode();
+    });
+    inp.addEventListener("keydown",function(e){
+      var i=+this.dataset.i;
+      if(e.key==="Backspace" && !this.value && i>0) inputs[i-1].focus();
+    });
+  });
+  refreshCode();
+  $("#joinBtn").addEventListener("click",function(){ renderMembers(); show("pick"); });
+
+  /* ---------- 2. pick member -------------------------------------- */
+  var picked=null;
+  function renderMembers(){
+    var wrap=$("#memberList"); wrap.innerHTML="";
+    MEMBERS.forEach(function(m){
+      var initials = m.name==="Dad" ? "D" : m.name[0];
+      var tagHtml="", cls="m-tile";
+      if(m.state==="you"){ tagHtml='<span class="m-tag you">You</span>'; }
+      else if(m.state==="in"){ tagHtml='<span class="m-tag in">Joined</span>'; }
+      else if(m.state==="in-proxy"){ tagHtml='<span class="m-tag in">Dad has this</span>'; }
+      else { tagHtml='<span class="m-tag">Open</span>'; }
+      var b=document.createElement("button");
+      b.className=cls; b.dataset.id=m.id;
+      b.innerHTML=
+        '<div class="avatar" style="background:'+m.color+'">'+initials+'</div>'+
+        '<div style="flex:1"><div class="m-name">'+m.name+' '+tagHtml+'</div>'+
+        '<div class="m-meta">Age '+m.age+'</div></div>';
+      b.addEventListener("click",function(){
+        picked=m.id;
+        $$(".m-tile",wrap).forEach(function(x){x.classList.remove("sel")});
+        b.classList.add("sel");
+        $("#pickBtn").disabled=false;
+        $("#pickBtn").textContent = m.id==="ryan" ? "That's me — continue" : "Continue as "+m.name;
+      });
+      // auto-preselect Ryan (the demo persona)
+      if(m.id==="ryan"){ setTimeout(function(){b.click()},120); }
+      wrap.appendChild(b);
+    });
+  }
+  $("#pickBtn").addEventListener("click",function(){ renderLobby(); show("lobby"); });
+
+  /* ---------- 3. lobby -------------------------------------------- */
+  function renderLobby(){
+    var r=$("#lobbyRoster"); r.innerHTML="";
+    MEMBERS.forEach(function(m){
+      var initials = m.name==="Dad" ? "D" : m.name[0];
+      var out = m.state==="out";
+      var status = m.state==="you" ? "you" :
+                   m.state==="in" ? "ready" :
+                   m.state==="in-proxy" ? "on Dad's phone" : "not in yet";
+      var c=document.createElement("div");
+      c.className="chip"+(out?" out":"");
+      c.innerHTML='<span class="dot" style="background:'+m.color+'">'+initials+'</span>'+
+        '<span>'+m.name+'</span><span class="status">'+status+'</span>';
+      r.appendChild(c);
+    });
+  }
+  $("#startBtn").addEventListener("click",function(){
+    S.setIdx=0; S.logged=[]; setSync(null);
+    startClock(); renderSet(); show("session");
+  });
+
+  /* ---------- clock ----------------------------------------------- */
+  function startClock(){
+    clearInterval(clockTimer);
+    clockTimer=setInterval(function(){
+      clockSec++;
+      var m=Math.floor(clockSec/60), s=clockSec%60;
+      $("#sessClock").textContent=(m<10?"0":"")+m+":"+(s<10?"0":"")+s;
+    },1000);
+  }
+
+  /* ---------- 4. block view / set logging ------------------------- */
+  function cur(){ return SETS[S.setIdx]; }
+
+  function renderSet(){
+    var st=cur();
+    $("#blockKicker").textContent=st.block;
+    $("#setLabel").textContent=st.setLabel;
+    $("#exName").textContent=st.ex;
+    $("#exCue").textContent=st.cue;
+    $("#repUnit").textContent=st.unit;
+    $("#targetTxt").textContent=st.target;
+    S.count=st.target;
+    var rc=$("#repCount"); rc.textContent=st.target;
+    rc.classList.toggle("pb", !!(st.benchmark && st.target>st.prevBest));
+
+    // rung tag
+    if(st.chainIdx!=null){
+      $("#rungTag").style.display="inline-flex";
+      $("#rungTag").innerHTML="◆ Your rung · "+PUSH_CHAIN[st.chainIdx];
+    } else {
+      $("#rungTag").style.display="none";
+    }
+
+    // benchmark flag + swap lock
+    if(st.benchmark){
+      $("#benchFlag").style.display="flex";
+      $("#benchText").textContent="Benchmark — beat last Tuesday: "+st.prevBest;
+    } else { $("#benchFlag").style.display="none"; }
+
+    var lockSwap=!st.swappable;
+    $("#tooHard").disabled=lockSwap; $("#tooEasy").disabled=lockSwap;
+    $("#tooHard").querySelector("small").textContent = lockSwap ? "measured — locked" : "ease the rung ↓";
+    $("#tooEasy").querySelector("small").textContent = lockSwap ? "measured — locked" : "step it up ↑";
+
+    renderTonight();
+  }
+
+  function bump(delta){
+    S.count=Math.max(0,S.count+delta);
+    var st=cur(), rc=$("#repCount");
+    rc.textContent=S.count;
+    rc.classList.toggle("pb", !!(st.benchmark && S.count>st.prevBest));
+  }
+  $("#plus").addEventListener("click",function(){bump(1)});
+  $("#minus").addEventListener("click",function(){bump(-1)});
+
+  $("#logBtn").addEventListener("click",function(){
+    var st=cur();
+    // optimistic local echo — logged instantly, big screen is authoritative
+    var entry={ex:st.ex, val:S.count, unit:st.unit, sync:"pending",
+      pb:!!(st.benchmark && S.count>st.prevBest)};
+    S.logged.push(entry);
+    setSync("pending");
+    renderTonight();
+    toast(st.benchmark && entry.pb
+      ? "Logged "+S.count+" — landing on the big screen…"
+      : "Logged "+S.count+" "+st.unit+" — sent to the big screen");
+    // simulate authoritative confirmation from the display
+    setTimeout(function(){
+      entry.sync="synced"; setSync("synced"); renderTonight();
+    }, 850);
+
+    // effort check-in fires once, after the first set (COPPA-bounded)
+    if(st.firstEffort && !S.effort){
+      setTimeout(function(){ openSheet("effortSheet"); }, 350);
+    } else {
+      setTimeout(advance, 500);
+    }
+  });
+
+  function renderTonight(){
+    if(!S.logged.length){ $("#tonightWrap").style.display="none"; return; }
+    $("#tonightWrap").style.display="block";
+    var list=$("#logList"); list.innerHTML="";
+    var total=0;
+    S.logged.forEach(function(e){
+      if(e.unit==="reps") total+=e.val;
+      var row=document.createElement("div"); row.className="log-item";
+      row.innerHTML='<span class="lx">'+e.ex+(e.pb?' <span class="pb-badge">PB</span>':'')+'</span>'+
+        '<span class="lv">'+e.val+'<span style="color:var(--ink-3);font-size:11px"> '+e.unit+'</span></span>'+
+        '<span class="ls '+e.sync+'"><span class="d"></span>'+(e.sync==="synced"?"synced":"pending")+'</span>';
+      list.appendChild(row);
+    });
+    $("#tonightTotal").textContent=total+" reps so far";
+  }
+
+  /* ---------- 5. effort check-in ---------------------------------- */
+  $$(".eff").forEach(function(b){
+    b.addEventListener("click",function(){
+      S.effort=this.dataset.eff;
+      $$(".eff").forEach(function(x){x.classList.remove("sel")});
+      this.classList.add("sel");
+      setTimeout(function(){
+        closeSheets();
+        if(S.effort==="hard"){
+          toast("Noted. If set two bites, ease the rung — no shame in it.");
+        } else if(S.effort==="easy"){
+          toast("Noted. Coach may nudge your target up next time.");
+        } else {
+          toast("Right where you should be. Onto set two.");
+        }
+        setTimeout(advance, 700);
+      }, 260);
+    });
+  });
+
+  /* ---------- swap ------------------------------------------------ */
+  function openSwap(dir){
+    var st=cur(); if(!st.swappable) return;
+    var i=st.chainIdx, opts=[];
+    // offer adjacent rungs from the swap chain (workout-experience §2: 2-3 options)
+    if(i>0) opts.push({idx:i-1, dir:"down", label:"Easier"});
+    opts.push({idx:i, dir:"same", label:"Stay here"});
+    if(i<PUSH_CHAIN.length-1) opts.push({idx:i+1, dir:"up", label:"Harder"});
+
+    $("#swapTitle").textContent = dir==="up" ? "Step it up" : "Ease the rung";
+    var wrap=$("#swapOpts"); wrap.innerHTML="";
+    opts.forEach(function(o){
+      var meta = o.dir==="down" ? "One rung down the chain" :
+                 o.dir==="up" ? "One rung up — earn it" : "Keep your current rung";
+      var arrow = o.dir==="down" ? "↓" : o.dir==="up" ? "↑" : "=";
+      var b=document.createElement("button"); b.className="swap-opt";
+      b.innerHTML='<span class="dir '+o.dir+'">'+arrow+'</span>'+
+        '<span style="flex:1"><span class="so-n">'+PUSH_CHAIN[o.idx]+'</span>'+
+        '<span class="so-m">'+meta+'</span></span>';
+      b.addEventListener("click",function(){ applySwap(o.idx, o.dir); });
+      wrap.appendChild(b);
+    });
+    openSheet("swapSheet");
+  }
+  function applySwap(newIdx, dir){
+    closeSheets();
+    if(dir==="same"){ return; }
+    // spec: private request, public result; applies from the NEXT set
+    var next=null;
+    for(var j=S.setIdx+1;j<SETS.length;j++){ if(SETS[j].ex==="Push-ups"){ next=SETS[j]; break; } }
+    if(next){
+      next.ex = PUSH_CHAIN[newIdx];
+      next.chainIdx = newIdx;
+      next.target = Math.max(4, next.target + (dir==="up"? -3 : 3)); // harder = fewer, easier = more
+      toast(PUSH_CHAIN[newIdx]+" — in on your next set. The room just sees the new name.");
+    } else {
+      toast("No more push-up sets tonight — nothing to swap.");
+    }
+  }
+  $("#tooHard").addEventListener("click",function(){ openSwap("down"); });
+  $("#tooEasy").addEventListener("click",function(){ openSwap("up"); });
+
+  /* ---------- rest + advance -------------------------------------- */
+  function advance(){
+    if(S.setIdx >= SETS.length-1){ finish(); return; }
+    startRest();
+  }
+  function startRest(){
+    var next=SETS[S.setIdx+1];
+    $("#restNextName").textContent=next.ex;
+    $("#restNextTarget").textContent=next.target;
+    var total = next.benchmark ? 60 : 45, left=total;
+    $("#restNum").textContent=left;
+    $("#restRing").style.setProperty("--deg","360deg");
+    openSheet("restSheet");
+    clearInterval(restTimer);
+    restTimer=setInterval(function(){
+      left--;
+      $("#restNum").textContent=left;
+      $("#restRing").style.setProperty("--deg",(360*left/total)+"deg");
+      if(left<=0){ endRest(); }
+    },1000);
+  }
+  function endRest(){
+    clearInterval(restTimer); closeSheets();
+    S.setIdx++; renderSet();
+    $("#viewport").scrollTop=0;
+  }
+  $("#skipRest").addEventListener("click", endRest);
+
+  /* ---------- 6. done --------------------------------------------- */
+  function finish(){
+    clearInterval(clockTimer);
+    var totalReps=0, sq=null;
+    S.logged.forEach(function(e){ if(e.unit==="reps") totalReps+=e.val; if(e.ex==="Bodyweight squats") sq=e; });
+    $("#grandTotal").textContent=totalReps;
+
+    var sum=$("#doneSummary"); sum.innerHTML="";
+    S.logged.forEach(function(e){
+      var row=document.createElement("div"); row.className="sum-row"+(e.pb?" pb":"");
+      row.innerHTML='<div><div class="sx">'+e.ex+(e.pb?' <span class="pb-badge">New PB</span>':'')+'</div>'+
+        '<div class="sm">'+(e.unit==="sec"?"hold":"working set")+'</div></div>'+
+        '<div class="sv">'+e.val+'<span style="font-size:12px;color:var(--ink-3)"> '+e.unit+'</span></div>';
+      sum.appendChild(row);
+    });
+
+    // coach line — Ryan register (§3 straight talk); every number is traceable to the log
+    var line, pb = sq && sq.pb;
+    if(pb){
+      var delta = sq.val - 18;
+      line = totalReps+" reps tonight. Squats "+sq.val+" — PB by "+delta+
+             ". Your pressing's catching your pull, and that gap is the muscle-up. Thursday we pull.";
+      $("#bookNote").style.display="flex";
+    } else if(sq){
+      line = totalReps+" reps tonight. Squats "+sq.val+", "+(18-sq.val)+
+             " off your best. The log doesn't need a reason — it needs Thursday.";
+      $("#bookNote").style.display="none";
+    } else {
+      line = totalReps+" reps tonight. Logged clean. Thursday we pull.";
+      $("#bookNote").style.display="none";
+    }
+    $("#coachLine").textContent=line;
+    setSync("synced");
+    show("done");
+  }
+
+})();
+</script>
+</body>
+</html>
