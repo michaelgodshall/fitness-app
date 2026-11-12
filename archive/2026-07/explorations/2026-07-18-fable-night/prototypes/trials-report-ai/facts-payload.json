@@ -1,0 +1,285 @@
+{
+  "$schemaProposal": "trials-report-facts/v1",
+  "$note": "EXPLORATION / PROTOTYPE — 2026-07-18 Fable night. This file doubles as a schema proposal for the structured facts payload the engine emits after Trials settlement (coach-voice.md §6 Tier 2). It is the ONLY input to Tier-2 generation: the model narrates these facts and may add zero facts. Every number a generated report prints must be locatable in this document. Illustrative data for the canonical placeholder family.",
+
+  "$designPrinciples": [
+    "Facts, never prose: the engine emits computed truth; the LLM supplies only sentence-craft.",
+    "Traceability is the contract: each renderable number carries an id path so validation is a mechanical lookup, not a judgment call.",
+    "The payload pre-computes every comparison the coach is allowed to make (member vs. own history, family vs. own past) and encodes the ones it is forbidden to make (sibling ordering) as constraints, so a well-behaved model cannot drift.",
+    "displayOrder is authoritative and non-performance-derived (age ascending). A leaderboard ordering is a validation failure, not a style choice.",
+    "The engine — not the model — selects the highlighted moment (published merit heuristic + drought guard). The model is told which one; it never ranks members."
+  ],
+
+  "meta": {
+    "payloadId": "trpf_2026-10_griffin",
+    "emittedAt": 1793318400000,
+    "emittedAtISO": "2026-11-01T00:00:00Z",
+    "engineVersion": "engine@0.0.0-proto",
+    "libraryVersion": "git:proto-2026-07-18",
+    "tier": 2,
+    "artifactKind": "trials-report",
+    "locale": "en-US",
+    "renderSurface": "family-account-only"
+  },
+
+  "family": {
+    "familyId": "fam_griffin",
+    "name": "The Griffins",
+    "timezone": "America/New_York",
+    "pactTarget": 3,
+    "displayOrder": ["m_sam", "m_leo", "m_ryan", "m_dad"],
+    "displayOrderRule": "age-ascending",
+    "displayOrderNote": "Fixed presentation order for the family. Age ascending, youngest first. NOT derived from scores or Progress Points. Any report that orders members by performance is invalid."
+  },
+
+  "members": [
+    {
+      "memberId": "m_sam",
+      "nickname": "Sam",
+      "callSign": null,
+      "ageBand": "8-10",
+      "ageForCopy": 8,
+      "isAdult": false,
+      "minorProtected": true,
+      "color": "#E8A33D",
+      "progressPointsThisTrials": 6,
+      "isCalibrationMember": false
+    },
+    {
+      "memberId": "m_leo",
+      "nickname": "Leo",
+      "callSign": null,
+      "ageBand": "8-10",
+      "ageForCopy": 10,
+      "isAdult": false,
+      "minorProtected": true,
+      "color": "#4FA6A1",
+      "progressPointsThisTrials": 4,
+      "isCalibrationMember": false
+    },
+    {
+      "memberId": "m_ryan",
+      "nickname": "Ryan",
+      "callSign": null,
+      "ageBand": "14-17",
+      "ageForCopy": 14,
+      "isAdult": false,
+      "minorProtected": false,
+      "color": "#C0563B",
+      "progressPointsThisTrials": 4,
+      "isCalibrationMember": false
+    },
+    {
+      "memberId": "m_dad",
+      "nickname": "Dad",
+      "callSign": "Dad",
+      "ageBand": "adult",
+      "ageForCopy": 42,
+      "isAdult": true,
+      "minorProtected": false,
+      "color": "#3D5A80",
+      "progressPointsThisTrials": 0,
+      "isCalibrationMember": false
+    }
+  ],
+
+  "trials": {
+    "trialsCycleId": "trials_fam_griffin_2026-10",
+    "monthKey": "2026-10",
+    "label": "October Trials",
+    "windowStart": "2026-10-19",
+    "completedAt": "2026-10-24",
+    "sessionCount": 2,
+    "sessionNote": "Split battery — 5 tests across 2 sessions within Trials week (allowed: up to 3).",
+    "isCalibration": false,
+    "graceUsed": false,
+    "flaggedLate": false,
+    "nextTrials": {
+      "monthKey": "2026-11",
+      "date": "2026-11-08",
+      "dateLabel": "November 8"
+    }
+  },
+
+  "tests": [
+    { "testId": "t_pushups", "name": "Push-Ups", "shortName": "push-ups", "metric": "reps", "unit": "reps", "direction": "higher-better",
+      "tierThresholds": { "rookie": 0, "trainee": 15, "skilled": 25, "advanced": 40, "elite": 55, "champion": 71 } },
+    { "testId": "t_squats", "name": "Air Squats", "shortName": "squats", "metric": "reps", "unit": "reps", "direction": "higher-better",
+      "tierThresholds": { "rookie": 0, "trainee": 25, "skilled": 40, "advanced": 55, "elite": 75, "champion": 100 } },
+    { "testId": "t_pullups", "name": "Pull-Ups", "shortName": "pull-ups", "metric": "reps", "unit": "reps", "direction": "higher-better",
+      "tierThresholds": { "rookie": 0, "trainee": 3, "skilled": 6, "advanced": 10, "elite": 15, "champion": 20 } },
+    { "testId": "t_deadhang", "name": "Dead Hang", "shortName": "dead hang", "metric": "hold-seconds", "unit": "seconds", "direction": "higher-better",
+      "tierThresholds": { "rookie": 0, "trainee": 20, "skilled": 40, "advanced": 60, "elite": 90, "champion": 120 } },
+    { "testId": "t_plank", "name": "Plank", "shortName": "plank", "metric": "hold-seconds", "unit": "seconds", "direction": "higher-better",
+      "tierThresholds": { "rookie": 0, "trainee": 30, "skilled": 60, "advanced": 90, "elite": 120, "champion": 180 } }
+  ],
+
+  "results": [
+    {
+      "memberId": "m_sam",
+      "perTest": [
+        { "testId": "t_squats", "score": 27, "priorBest": 21, "priorBestDate": "2026-09-21", "delta": 6, "isAllTimeBest": true, "matchedBest": false,
+          "tier": "trainee", "priorTier": "rookie", "tierCrossed": { "from": "rookie", "to": "trainee" },
+          "progressPoints": 4, "ppBreakdown": { "flatPB": 2, "tierBonus": 2 },
+          "judgeMemberId": "m_dad",
+          "history": [ { "monthKey": "2026-07", "score": 16 }, { "monthKey": "2026-08", "score": 18 }, { "monthKey": "2026-09", "score": 21 }, { "monthKey": "2026-10", "score": 27 } ] },
+        { "testId": "t_pushups", "score": 12, "priorBest": 10, "priorBestDate": "2026-09-21", "delta": 2, "isAllTimeBest": true, "matchedBest": false,
+          "tier": "rookie", "priorTier": "rookie", "tierCrossed": null,
+          "progressPoints": 2, "ppBreakdown": { "flatPB": 2, "tierBonus": 0 },
+          "judgeMemberId": "m_dad",
+          "history": [ { "monthKey": "2026-07", "score": 7 }, { "monthKey": "2026-08", "score": 8 }, { "monthKey": "2026-09", "score": 10 }, { "monthKey": "2026-10", "score": 12 } ] },
+        { "testId": "t_pullups", "score": 1, "priorBest": 1, "delta": 0, "isAllTimeBest": false, "matchedBest": true,
+          "tier": "rookie", "priorTier": "rookie", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_dad" },
+        { "testId": "t_deadhang", "score": 14, "priorBest": 14, "delta": 0, "isAllTimeBest": false, "matchedBest": true,
+          "tier": "rookie", "priorTier": "rookie", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_ryan" },
+        { "testId": "t_plank", "score": 30, "priorBest": 33, "delta": -3, "isAllTimeBest": false, "matchedBest": false,
+          "tier": "trainee", "priorTier": "trainee", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_dad" }
+      ]
+    },
+    {
+      "memberId": "m_leo",
+      "perTest": [
+        { "testId": "t_deadhang", "score": 20, "priorBest": 15, "priorBestDate": "2026-09-20", "delta": 5, "isAllTimeBest": true, "matchedBest": false,
+          "tier": "trainee", "priorTier": "rookie", "tierCrossed": { "from": "rookie", "to": "trainee" },
+          "isFirstAcrossThreshold": { "threshold": 20, "label": "first 20-second dead hang" },
+          "progressPoints": 4, "ppBreakdown": { "flatPB": 2, "tierBonus": 2 },
+          "judgeMemberId": "m_ryan", "countedByMemberIds": ["m_ryan", "m_sam"],
+          "witnessNote": "Test judged by his brothers — Ryan on the count, Sam calling the seconds. This is a logged judge/roster fact, not an observation.",
+          "history": [ { "monthKey": "2026-07", "score": 8 }, { "monthKey": "2026-08", "score": 11 }, { "monthKey": "2026-09", "score": 15 }, { "monthKey": "2026-10", "score": 20 } ] },
+        { "testId": "t_pushups", "score": 18, "priorBest": 18, "delta": 0, "isAllTimeBest": false, "matchedBest": true,
+          "tier": "trainee", "priorTier": "trainee", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_dad" },
+        { "testId": "t_squats", "score": 33, "priorBest": 36, "delta": -3, "isAllTimeBest": false, "matchedBest": false,
+          "tier": "trainee", "priorTier": "trainee", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_dad" },
+        { "testId": "t_pullups", "score": 3, "priorBest": 3, "delta": 0, "isAllTimeBest": false, "matchedBest": true,
+          "tier": "trainee", "priorTier": "trainee", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_dad" },
+        { "testId": "t_plank", "score": 44, "priorBest": 48, "delta": -4, "isAllTimeBest": false, "matchedBest": false,
+          "tier": "skilled", "priorTier": "skilled", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_dad" }
+      ]
+    },
+    {
+      "memberId": "m_ryan",
+      "perTest": [
+        { "testId": "t_plank", "score": 72, "priorBest": 58, "priorBestDate": "2026-09-20", "delta": 14, "isAllTimeBest": true, "matchedBest": false,
+          "tier": "skilled", "priorTier": "trainee", "tierCrossed": { "from": "trainee", "to": "skilled" },
+          "tierNarrativeHint": "The Skilled line (60s) — a universal standard, not age-adjusted.",
+          "circlingSince": "2026-04",
+          "progressPoints": 4, "ppBreakdown": { "flatPB": 2, "tierBonus": 2 },
+          "judgeMemberId": "m_dad",
+          "history": [ { "monthKey": "2026-06", "score": 52 }, { "monthKey": "2026-07", "score": 55 }, { "monthKey": "2026-08", "score": 57 }, { "monthKey": "2026-09", "score": 58 }, { "monthKey": "2026-10", "score": 72 } ] },
+        { "testId": "t_pullups", "score": 9, "priorBest": 9, "delta": 0, "isAllTimeBest": false, "matchedBest": true,
+          "tier": "skilled", "priorTier": "skilled", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_dad" },
+        { "testId": "t_pushups", "score": 33, "priorBest": 33, "delta": 0, "isAllTimeBest": false, "matchedBest": true,
+          "tier": "advanced", "priorTier": "advanced", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_dad" },
+        { "testId": "t_squats", "score": 48, "priorBest": 51, "delta": -3, "isAllTimeBest": false, "matchedBest": false,
+          "tier": "skilled", "priorTier": "skilled", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_dad" },
+        { "testId": "t_deadhang", "score": 47, "priorBest": 50, "delta": -3, "isAllTimeBest": false, "matchedBest": false,
+          "tier": "skilled", "priorTier": "skilled", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_dad" }
+      ]
+    },
+    {
+      "memberId": "m_dad",
+      "flatMonth": true,
+      "flatMonthContext": {
+        "narrativeFrame": "consistency-hold",
+        "instruction": "Zero all-time bests this cycle. Frame through consistency and showing up, NEVER as decline, loss, or falling behind. Below-best scores exist in the data but must not be narrated as decline. Matched-best is a legitimate hold worth naming.",
+        "absencesThisCycle": [ { "date": "2026-10-06", "reason": "away", "label": "work trip" }, { "date": "2026-10-15", "reason": "away", "label": "work trip" } ],
+        "absenceCountLabel": "two work trips",
+        "trainedAnyway": true,
+        "sessionsThisMonth": 11
+      },
+      "perTest": [
+        { "testId": "t_pullups", "score": 15, "priorBest": 15, "priorBestDate": "2026-08-17", "delta": 0, "isAllTimeBest": false, "matchedBest": true,
+          "tier": "elite", "priorTier": "elite", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_ryan",
+          "matchNarrativeHint": "Matched lifetime best of 15. A hold, not a miss — worth naming plainly.",
+          "history": [ { "monthKey": "2026-06", "score": 15 }, { "monthKey": "2026-07", "score": 14 }, { "monthKey": "2026-08", "score": 15 }, { "monthKey": "2026-09", "score": 14 }, { "monthKey": "2026-10", "score": 15 } ] },
+        { "testId": "t_pushups", "score": 42, "priorBest": 44, "delta": -2, "isAllTimeBest": false, "matchedBest": false,
+          "tier": "advanced", "priorTier": "advanced", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_ryan" },
+        { "testId": "t_squats", "score": 58, "priorBest": 62, "delta": -4, "isAllTimeBest": false, "matchedBest": false,
+          "tier": "elite", "priorTier": "elite", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_ryan" },
+        { "testId": "t_deadhang", "score": 62, "priorBest": 66, "delta": -4, "isAllTimeBest": false, "matchedBest": false,
+          "tier": "advanced", "priorTier": "advanced", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_ryan" },
+        { "testId": "t_plank", "score": 105, "priorBest": 110, "delta": -5, "isAllTimeBest": false, "matchedBest": false,
+          "tier": "advanced", "priorTier": "advanced", "tierCrossed": null, "progressPoints": 0, "judgeMemberId": "m_ryan" }
+      ]
+    }
+  ],
+
+  "familyHeadline": {
+    "progressPointsTotal": 14,
+    "progressPointsByMember": { "m_sam": 6, "m_leo": 4, "m_ryan": 4, "m_dad": 0 },
+    "progressPointsHistory": [
+      { "monthKey": "2026-06", "label": "June", "total": 15 },
+      { "monthKey": "2026-07", "label": "July", "total": 10 },
+      { "monthKey": "2026-08", "label": "August", "total": 11 },
+      { "monthKey": "2026-09", "label": "September", "total": 8 },
+      { "monthKey": "2026-10", "label": "October", "total": 14 }
+    ],
+    "headlineComparison": {
+      "claim": "best month since June",
+      "derivation": "14 PP is the highest monthly total in the window after June (Jul 10, Aug 11, Sep 8); June itself was 15. Traceable, exact, defensible.",
+      "isBestEver": false,
+      "isBestSince": { "monthKey": "2026-06", "label": "June" }
+    },
+    "familyAbsoluteTierAverage": {
+      "value": "Skilled",
+      "note": "Secondary stat (legacy family-average tier). NOT the headline. Available if the report wants a single supporting line; never a leaderboard."
+    },
+    "participation": { "membersTested": 4, "membersPlanned": 4, "fullFamily": true }
+  },
+
+  "consistencyContext": {
+    "streakCompleteWeeks": 6,
+    "streakNote": "6 consecutive complete family Pact weeks going into Trials week.",
+    "pactWeekOfTrials": { "target": 3, "complete": true, "coveredSessions": 3 },
+    "familyMilestonesThisMonth": []
+  },
+
+  "recordBookChanges": [
+    { "recordBookEntryId": "rb_2026-10_01", "memberId": "m_sam", "kind": "trials-pb", "testId": "t_squats", "line": "Sam — Air Squats: 27 (was 21). New Trainee.", "chalkedAt": "2026-10-24" },
+    { "recordBookEntryId": "rb_2026-10_02", "memberId": "m_sam", "kind": "trials-pb", "testId": "t_pushups", "line": "Sam — Push-Ups: 12 (was 10).", "chalkedAt": "2026-10-24" },
+    { "recordBookEntryId": "rb_2026-10_03", "memberId": "m_leo", "kind": "trials-pb", "testId": "t_deadhang", "line": "Leo — Dead Hang: 20s (was 15s). First 20-second hold. New Trainee.", "chalkedAt": "2026-10-24" },
+    { "recordBookEntryId": "rb_2026-10_04", "memberId": "m_ryan", "kind": "trials-pb", "testId": "t_plank", "line": "Ryan — Plank: 72s (was 58s). New Skilled.", "chalkedAt": "2026-10-24" }
+  ],
+
+  "highlightedMoment": {
+    "selectedBy": "engine",
+    "memberId": "m_leo",
+    "testId": "t_deadhang",
+    "reasonCode": "first-across-threshold",
+    "heuristicTrace": {
+      "rule": "firsts > tier-crossings > largest tier-weighted margin (founder-decision Q15)",
+      "candidates": [
+        { "memberId": "m_leo", "testId": "t_deadhang", "class": "first", "detail": "first 20-second dead hang + tier crossing; witnessed by both brothers", "rank": 1 },
+        { "memberId": "m_sam", "testId": "t_squats", "class": "tier-crossing", "detail": "rookie→trainee, +6 margin (largest of the month)", "rank": 2 },
+        { "memberId": "m_ryan", "testId": "t_plank", "class": "tier-crossing", "detail": "trainee→skilled, crossed the Skilled line", "rank": 3 }
+      ],
+      "droughtGuard": { "triggered": false, "note": "Leo has not been highlighted in the last 3 cycles (Jul=Sam, Aug=Ryan, Sep=Sam), so no override needed — merit and rotation agree." }
+    },
+    "highlightHistory": [
+      { "monthKey": "2026-07", "memberId": "m_sam" },
+      { "monthKey": "2026-08", "memberId": "m_ryan" },
+      { "monthKey": "2026-09", "memberId": "m_sam" }
+    ]
+  },
+
+  "forwardHook": {
+    "nextTrialsDateLabel": "November 8",
+    "framing": "Everything set this month becomes the number to beat next month.",
+    "note": "The engine supplies the date and the neutral framing; the model may phrase the hook but adds no new facts or promises."
+  },
+
+  "generationConstraints": {
+    "mayAddFacts": false,
+    "everyNumberMustTraceToPayload": true,
+    "memberCoverage": "Every tested member (all 4) must receive exactly one named moment measured only against their own history.",
+    "displayOrder": ["m_sam", "m_leo", "m_ryan", "m_dad"],
+    "displayOrderIsAuthoritative": true,
+    "noSiblingComparison": true,
+    "noSiblingOrdering": "Members must appear in displayOrder. Do not sort or imply ranking by score or Progress Points. Kids out-earning Dad in PP is fine as family physics but is never framed as Dad losing.",
+    "flatMonthMembers": ["m_dad"],
+    "bannedTopics": ["body", "weight", "size", "appearance", "diet", "nutrition", "puberty", "growth-as-cause", "absence-as-leverage", "medical-advice"],
+    "clipboardNotCamera": "No 'I saw / I noticed / I watched.' Only what is logged: judges, counts, dates, deltas.",
+    "highlightedMomentMemberId": "m_leo",
+    "toneRegisterByMember": { "m_sam": "8", "m_leo": "8-10", "m_ryan": "14", "m_dad": "adult" }
+  }
+}

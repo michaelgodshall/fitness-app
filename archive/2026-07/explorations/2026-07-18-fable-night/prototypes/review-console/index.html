@@ -1,0 +1,934 @@
+<title>Batch Review Console — Library Authoring</title>
+<style>
+  :root{
+    --bg:#141210;
+    --bg-2:#1b1815;
+    --surface:#201d19;
+    --surface-2:#262119;
+    --line:#332d25;
+    --line-2:#403830;
+    --ink:#ece4d6;
+    --ink-2:#b3a998;
+    --mut:#877d6c;
+    --mut-2:#635b4e;
+    --ember:#e07a3c;
+    --ember-soft:#c98a3c;
+    --accept:#7bab5f;
+    --accept-bg:#1c2417;
+    --reject:#c85a44;
+    --reject-bg:#2a1a16;
+    --warn:#d9a336;
+    --warn-bg:#2a2313;
+    --steel:#7d9db2;
+    --steel-bg:#182029;
+    --font-display:'Futura','Avenir Next Condensed','Century Gothic',sans-serif;
+    --font-ui:'Avenir Next','Helvetica Neue',system-ui,sans-serif;
+    --font-mono:'SF Mono','Menlo','Roboto Mono',monospace;
+    --font-voice:'Charter','Iowan Old Style','Georgia',serif;
+    --r:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:var(--bg);color:var(--ink);font-family:var(--font-ui);-webkit-font-smoothing:antialiased}
+  body{
+    background:
+      radial-gradient(1200px 500px at 82% -8%, rgba(224,122,60,.10), transparent 60%),
+      radial-gradient(900px 600px at -10% 110%, rgba(125,157,178,.06), transparent 55%),
+      var(--bg);
+    min-height:100vh;padding-bottom:88px;
+  }
+  ::selection{background:rgba(224,122,60,.28)}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 26px}
+
+  /* ---------- prototype ribbon ---------- */
+  .ribbon{
+    position:fixed;top:14px;right:-46px;transform:rotate(38deg);z-index:60;
+    background:var(--ember);color:#1a120b;font-family:var(--font-mono);font-size:10px;
+    letter-spacing:.22em;font-weight:600;padding:5px 56px;text-transform:uppercase;
+    box-shadow:0 6px 22px rgba(0,0,0,.5);
+  }
+
+  /* ---------- masthead ---------- */
+  header.mast{border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--bg-2),transparent);}
+  .mast-top{display:flex;align-items:baseline;justify-content:space-between;padding:26px 0 6px;gap:20px;flex-wrap:wrap}
+  .brand{font-family:var(--font-display);letter-spacing:.02em}
+  .brand .k{font-size:12px;letter-spacing:.42em;color:var(--ember-soft);text-transform:uppercase;display:block;margin-bottom:7px;font-family:var(--font-mono);font-weight:600}
+  .brand h1{font-size:31px;font-weight:600;letter-spacing:.01em;line-height:1}
+  .batch-id{font-family:var(--font-mono);font-size:12px;color:var(--mut);text-align:right;line-height:1.7}
+  .batch-id b{color:var(--ink-2);font-weight:500}
+
+  .brief{
+    margin:18px 0 4px;padding:16px 18px;border:1px solid var(--line);border-left:3px solid var(--ember);
+    border-radius:var(--r);background:var(--surface);
+  }
+  .brief .lbl{font-family:var(--font-mono);font-size:10px;letter-spacing:.24em;color:var(--mut);text-transform:uppercase;margin-bottom:7px}
+  .brief .q{font-family:var(--font-display);font-size:21px;font-weight:500;color:var(--ink);letter-spacing:.01em}
+  .brief .src{font-family:var(--font-mono);font-size:11px;color:var(--mut-2);margin-top:8px}
+
+  /* triage + meter row */
+  .telem{display:grid;grid-template-columns:1.15fr 1fr;gap:16px;margin:16px 0 22px}
+  @media(max-width:820px){.telem{grid-template-columns:1fr}}
+  .panel{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);padding:15px 17px}
+  .panel h2{font-family:var(--font-mono);font-size:10px;letter-spacing:.24em;color:var(--mut);text-transform:uppercase;font-weight:600;margin-bottom:13px;display:flex;justify-content:space-between}
+  .panel h2 .disc{color:var(--mut-2);cursor:pointer;letter-spacing:0}
+
+  /* triage funnel */
+  .funnel{display:flex;align-items:center;gap:10px;font-family:var(--font-mono)}
+  .funnel .step{flex:1;text-align:center}
+  .funnel .n{font-family:var(--font-display);font-size:26px;font-weight:600;display:block;line-height:1}
+  .funnel .s{font-size:9.5px;letter-spacing:.14em;color:var(--mut);text-transform:uppercase;margin-top:5px}
+  .funnel .arw{color:var(--mut-2);font-size:16px}
+  .funnel .rej .n{color:var(--reject)}
+  .funnel .rev .n{color:var(--ember)}
+  .rejects{margin-top:13px;border-top:1px dashed var(--line);padding-top:11px;display:none}
+  .rejects.open{display:block}
+  .rej-row{display:flex;gap:10px;padding:7px 0;font-size:12.5px;border-bottom:1px solid var(--bg-2)}
+  .rej-row:last-child{border-bottom:none}
+  .rej-row .rn{font-family:var(--font-mono);color:var(--ink-2);min-width:150px;flex-shrink:0}
+  .rej-row .rd{color:var(--mut);line-height:1.5}
+  .rej-row .rd .tag{color:var(--reject);font-family:var(--font-mono);font-size:10.5px;letter-spacing:.05em}
+
+  /* keep-rate meter */
+  .meter-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:11px}
+  .meter-val{font-family:var(--font-display);font-size:34px;font-weight:600;line-height:.9}
+  .meter-val small{font-size:14px;color:var(--mut);font-weight:400;font-family:var(--font-ui)}
+  .meter-note{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.1em;text-align:right;max-width:150px}
+  .gauge{position:relative;height:12px;border-radius:6px;overflow:hidden;background:var(--bg-2);border:1px solid var(--line)}
+  .gauge .zone{position:absolute;top:0;bottom:0}
+  .zone.z-red{left:0;width:30%;background:repeating-linear-gradient(45deg,rgba(200,90,68,.16),rgba(200,90,68,.16) 5px,transparent 5px,transparent 10px)}
+  .zone.z-ok{left:30%;width:55%;background:rgba(123,171,95,.14)}
+  .zone.z-amber{left:85%;width:15%;background:repeating-linear-gradient(45deg,rgba(217,163,54,.18),rgba(217,163,54,.18) 5px,transparent 5px,transparent 10px)}
+  .gauge .fill{position:absolute;top:0;bottom:0;left:0;background:linear-gradient(90deg,var(--ember-soft),var(--ember));width:0;transition:width .45s cubic-bezier(.2,.8,.2,1);opacity:.9}
+  .gauge .needle{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);left:0;transition:left .45s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 6px rgba(0,0,0,.6)}
+  .bands{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:9px;letter-spacing:.08em;color:var(--mut-2);margin-top:7px;text-transform:uppercase}
+
+  /* progress */
+  .prog-wrap{margin-bottom:8px}
+  .prog-head{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:11px;color:var(--mut);margin-bottom:7px}
+  .prog-head b{color:var(--ink)}
+  .prog{height:6px;background:var(--bg-2);border-radius:4px;overflow:hidden;border:1px solid var(--line)}
+  .prog .pf{height:100%;background:var(--ink-2);width:0;transition:width .4s ease}
+  .tally{display:flex;gap:16px;margin-top:9px;font-family:var(--font-mono);font-size:11px}
+  .tally span{color:var(--mut)}
+  .tally b{font-family:var(--font-display);font-size:15px;margin-right:4px}
+  .tally .ta b{color:var(--accept)} .tally .te b{color:var(--ember)} .tally .tr b{color:var(--reject)}
+
+  /* ---------- batch table ---------- */
+  .group-head{display:flex;align-items:center;gap:12px;margin:26px 0 12px;padding-bottom:9px;border-bottom:1px solid var(--line)}
+  .group-head .gt{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ember-soft)}
+  .group-head .gc{font-family:var(--font-mono);font-size:11px;color:var(--mut-2)}
+  .group-head .rule{flex:1;height:1px;background:var(--line)}
+
+  .row{border:1px solid var(--line);border-radius:var(--r);margin-bottom:9px;background:var(--surface);overflow:hidden;transition:border-color .2s,box-shadow .2s}
+  .row.focus{border-color:var(--ember);box-shadow:0 0 0 1px rgba(224,122,60,.35),0 12px 34px rgba(0,0,0,.4)}
+  .row.done-accept{border-left:3px solid var(--accept)}
+  .row.done-edit{border-left:3px solid var(--ember)}
+  .row.done-reject{border-left:3px solid var(--reject);opacity:.72}
+  .rowhead{display:flex;align-items:center;gap:14px;padding:13px 16px;cursor:pointer;user-select:none}
+  .idx{font-family:var(--font-mono);font-size:11px;color:var(--mut-2);width:22px;flex-shrink:0}
+  .type-chip{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;padding:4px 8px;border-radius:5px;flex-shrink:0;font-weight:600}
+  .type-exercise{background:var(--steel-bg);color:var(--steel);border:1px solid rgba(125,157,178,.28)}
+  .type-voice{background:rgba(224,122,60,.1);color:var(--ember-soft);border:1px solid rgba(224,122,60,.28)}
+  .type-block{background:rgba(217,163,54,.1);color:var(--warn);border:1px solid rgba(217,163,54,.28)}
+  .rowname{font-family:var(--font-display);font-size:17px;font-weight:500;color:var(--ink);flex:1;letter-spacing:.01em}
+  .rowname .sub{font-family:var(--font-ui);font-size:12px;color:var(--mut);font-weight:400;margin-left:9px}
+  .flags{display:flex;gap:6px;flex-shrink:0}
+  .flag{font-family:var(--font-mono);font-size:9px;letter-spacing:.06em;padding:3px 7px;border-radius:4px;text-transform:uppercase}
+  .flag.f-order{background:var(--reject-bg);color:var(--reject);border:1px solid rgba(200,90,68,.4)}
+  .flag.f-dup{background:var(--warn-bg);color:var(--warn);border:1px solid rgba(217,163,54,.4)}
+  .flag.f-lint{background:var(--reject-bg);color:var(--reject);border:1px solid rgba(200,90,68,.4)}
+  .flag.f-lowconf{background:var(--steel-bg);color:var(--steel);border:1px solid rgba(125,157,178,.35)}
+  .badge{font-family:var(--font-mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:5px 9px;border-radius:5px;flex-shrink:0;min-width:74px;text-align:center}
+  .badge.pending{background:var(--bg-2);color:var(--mut-2);border:1px solid var(--line)}
+  .badge.b-accept{background:var(--accept-bg);color:var(--accept);border:1px solid rgba(123,171,95,.4)}
+  .badge.b-edit{background:rgba(224,122,60,.12);color:var(--ember);border:1px solid rgba(224,122,60,.4)}
+  .badge.b-reject{background:var(--reject-bg);color:var(--reject);border:1px solid rgba(200,90,68,.4)}
+  .caret{color:var(--mut-2);font-size:11px;transition:transform .2s;flex-shrink:0}
+  .row.open .caret{transform:rotate(90deg)}
+
+  /* ---------- decision card ---------- */
+  .card{display:none;border-top:1px solid var(--line);padding:20px 18px 8px;background:var(--bg-2)}
+  .row.open .card{display:block}
+  .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:780px){.card-grid{grid-template-columns:1fr}}
+  .card .sec{margin-bottom:16px}
+  .card .sh{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--mut);margin-bottom:9px}
+
+  /* chain strip */
+  .chain{display:flex;align-items:stretch;gap:0;overflow-x:auto;padding:4px 0 8px}
+  .rung{position:relative;flex:0 0 auto;min-width:96px;padding:9px 11px;border:1px solid var(--line);background:var(--surface);text-align:center;margin-right:20px}
+  .rung:not(:last-child):after{content:'→';position:absolute;right:-16px;top:50%;transform:translateY(-50%);color:var(--mut-2);font-size:13px}
+  .rung.approved{border-radius:7px}
+  .rung.cand{border-color:var(--ember);background:rgba(224,122,60,.09);border-radius:7px;box-shadow:0 0 0 1px rgba(224,122,60,.25)}
+  .rung.cand.bad{border-color:var(--reject);background:var(--reject-bg);box-shadow:0 0 0 1px rgba(200,90,68,.35)}
+  .rung.cand.ok-accepted{border-color:var(--accept);background:var(--accept-bg);box-shadow:0 0 0 1px rgba(123,171,95,.3)}
+  .rung .rname{font-family:var(--font-ui);font-size:11.5px;color:var(--ink-2);line-height:1.25;min-height:29px;display:flex;align-items:center;justify-content:center}
+  .rung.cand .rname{color:var(--ink);font-weight:600}
+  .rung .meta{font-family:var(--font-mono);font-size:9.5px;color:var(--mut);margin-top:6px;display:flex;justify-content:center;gap:7px}
+  .rung .meta .dd{color:var(--ember-soft)}
+  .rung.cand.bad .meta .dd{color:var(--reject)}
+  .rung .youtag{position:absolute;top:-9px;left:50%;transform:translateX(-50%);font-family:var(--font-mono);font-size:8px;letter-spacing:.1em;background:var(--ember);color:#1a120b;padding:2px 6px;border-radius:3px;text-transform:uppercase;white-space:nowrap}
+  .rung.cand.bad .youtag{background:var(--reject);color:#fff}
+  .chain-verdict{margin-top:6px;font-family:var(--font-mono);font-size:11px;padding:9px 11px;border-radius:6px;line-height:1.5}
+  .chain-verdict.ok{background:var(--accept-bg);color:var(--accept);border:1px solid rgba(123,171,95,.3)}
+  .chain-verdict.bad{background:var(--reject-bg);color:var(--reject);border:1px solid rgba(200,90,68,.35)}
+  .chain-verdict b{color:inherit}
+
+  /* metadata chips */
+  .chips{display:flex;flex-wrap:wrap;gap:7px}
+  .chip{font-family:var(--font-mono);font-size:10.5px;padding:5px 9px;border-radius:5px;background:var(--surface);border:1px solid var(--line);color:var(--ink-2)}
+  .chip .ck{color:var(--mut-2);margin-right:5px}
+  .cues{list-style:none}
+  .cues li{font-size:13px;color:var(--ink-2);padding:5px 0 5px 16px;position:relative;line-height:1.45}
+  .cues li:before{content:'—';position:absolute;left:0;color:var(--ember-soft)}
+  .safety{font-size:12.5px;color:var(--ink-2);background:var(--reject-bg);border:1px solid rgba(200,90,68,.25);border-radius:6px;padding:10px 12px;line-height:1.5}
+  .safety .sk{font-family:var(--font-mono);font-size:9px;letter-spacing:.16em;color:var(--reject);text-transform:uppercase;display:block;margin-bottom:5px}
+  .rationale{font-family:var(--font-voice);font-style:italic;font-size:14px;color:var(--ink-2);line-height:1.5;border-left:2px solid var(--line-2);padding-left:12px}
+
+  /* sim evidence */
+  .sim{background:var(--steel-bg);border:1px solid rgba(125,157,178,.22);border-radius:6px;padding:11px 13px}
+  .sim .big{font-family:var(--font-display);font-size:15px;color:var(--ink);margin-bottom:6px}
+  .sim .big b{color:var(--steel)}
+  .sim .rosters{font-family:var(--font-mono);font-size:11px;color:var(--mut);line-height:1.6}
+  .sim.warn-sel{background:var(--warn-bg);border-color:rgba(217,163,54,.3)}
+  .sim.warn-sel .big b{color:var(--warn)}
+
+  /* similarity */
+  .simil{margin-top:11px;font-family:var(--font-mono);font-size:11.5px;padding:10px 12px;border-radius:6px;background:var(--warn-bg);border:1px solid rgba(217,163,54,.3);color:var(--ink-2);line-height:1.5}
+  .simil .st{color:var(--warn);letter-spacing:.05em}
+  .simil.distinct{background:var(--steel-bg);border-color:rgba(125,157,178,.25)}
+  .simil.distinct .st{color:var(--steel)}
+
+  /* voice card */
+  .voice-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:780px){.voice-cols{grid-template-columns:1fr}}
+  .vcol .vlbl{font-family:var(--font-mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin-bottom:9px;display:flex;align-items:center;gap:8px}
+  .vcol .vlbl .pip{width:6px;height:6px;border-radius:50%}
+  .vline{font-family:var(--font-voice);font-size:16.5px;line-height:1.6;color:var(--ink);padding:15px 17px;border-radius:8px;background:var(--surface);border:1px solid var(--line)}
+  .vcol.gold .vline{border-color:var(--line-2);background:linear-gradient(180deg,rgba(224,122,60,.05),transparent)}
+  .vcol.gold .pip{background:var(--ember-soft)}
+  .vcol.cand.clean .vline{border-color:rgba(123,171,95,.35)}
+  .vcol.cand.clean .pip{background:var(--accept)}
+  .vcol.cand.dirty .vline{border-color:rgba(200,90,68,.4)}
+  .vcol.cand.dirty .pip{background:var(--reject)}
+  .vline .hl{background:rgba(200,90,68,.24);border-bottom:1.5px solid var(--reject);border-radius:2px;padding:0 2px;cursor:help}
+  .lint{margin-top:13px}
+  .lint .lrow{display:flex;gap:11px;padding:8px 0;border-bottom:1px solid var(--bg-2);font-size:12.5px}
+  .lint .lrow:last-child{border:none}
+  .lint .lx{color:var(--reject);font-family:var(--font-mono);font-weight:600;flex-shrink:0}
+  .lint .lname{font-family:var(--font-mono);font-size:10.5px;color:var(--reject);min-width:150px;flex-shrink:0;letter-spacing:.03em}
+  .lint .ldesc{color:var(--ink-2);line-height:1.5}
+  .lint .ldesc .quote{font-family:var(--font-voice);font-style:italic;color:var(--ink)}
+  .lint.clean .lrow .lok{color:var(--accept);font-family:var(--font-mono)}
+
+  /* block card */
+  .blockdiag{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .bd-head{font-family:var(--font-mono);font-size:10.5px;color:var(--mut);padding:9px 13px;background:var(--surface-2);letter-spacing:.1em;text-transform:uppercase;display:flex;justify-content:space-between}
+  .bd-slot{display:flex;align-items:center;gap:12px;padding:11px 13px;border-top:1px solid var(--line)}
+  .bd-slot .bn{font-family:var(--font-mono);font-size:11px;color:var(--mut-2);width:20px}
+  .bd-slot .bx{font-family:var(--font-ui);font-size:14px;color:var(--ink-2);flex:1}
+  .bd-slot .bs{font-family:var(--font-mono);font-size:11.5px;color:var(--ember-soft)}
+  .bd-foot{padding:9px 13px;border-top:1px solid var(--line);font-family:var(--font-mono);font-size:11px;color:var(--mut);background:var(--surface-2)}
+  .timemodel{margin-top:13px}
+  .tm-bar{position:relative;height:34px;border-radius:6px;background:var(--bg-2);border:1px solid var(--line);margin:8px 0}
+  .tm-est,.tm-real{position:absolute;top:0;bottom:0;display:flex;align-items:center;padding-left:10px;font-family:var(--font-mono);font-size:11px}
+  .tm-est{left:0;background:rgba(125,157,178,.16);border-right:2px solid var(--steel);color:var(--steel)}
+  .tm-real{left:0;background:transparent;border-right:2px dashed var(--ember);color:var(--ember);pointer-events:none}
+  .tm-real span{position:absolute;right:-2px;transform:translateX(100%);padding-left:8px;white-space:nowrap}
+  .tm-verdict{font-family:var(--font-mono);font-size:11.5px;color:var(--warn);line-height:1.5}
+
+  /* ---------- decision affordances ---------- */
+  .actions{border-top:1px solid var(--line);margin-top:8px;padding-top:15px;display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+  .abtn{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:9px 15px;border-radius:6px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:8px}
+  .abtn .key{font-family:var(--font-mono);font-size:9.5px;background:var(--bg);border:1px solid var(--line-2);border-radius:3px;padding:1px 5px;color:var(--mut)}
+  .abtn:hover{border-color:var(--mut)}
+  .abtn.acc:hover{border-color:var(--accept);color:var(--accept)}
+  .abtn.edt:hover{border-color:var(--ember);color:var(--ember)}
+  .abtn.rej:hover{border-color:var(--reject);color:var(--reject)}
+  .actions .spacer{flex:1}
+  .decided-note{font-family:var(--font-mono);font-size:11px;color:var(--mut)}
+  .decided-note b{color:var(--ink-2)}
+
+  /* reason tags */
+  .reasons{display:none;gap:8px;flex-wrap:wrap;margin-top:13px;padding:14px;border:1px dashed rgba(200,90,68,.4);border-radius:8px;background:var(--reject-bg)}
+  .reasons.open{display:flex}
+  .reasons .rt-head{width:100%;font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--reject);margin-bottom:2px}
+  .rtag{font-family:var(--font-mono);font-size:11px;padding:8px 12px;border-radius:6px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);cursor:pointer;transition:all .12s;display:flex;align-items:center;gap:8px}
+  .rtag:hover{border-color:var(--reject);color:var(--reject)}
+  .rtag .rk{font-size:9.5px;background:var(--bg);border:1px solid var(--line-2);border-radius:3px;padding:1px 5px;color:var(--mut)}
+
+  /* edit box */
+  .editbox{display:none;margin-top:13px;padding:14px;border:1px dashed rgba(224,122,60,.4);border-radius:8px;background:rgba(224,122,60,.05)}
+  .editbox.open{display:block}
+  .editbox .eh{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ember);margin-bottom:9px}
+  .editbox textarea{width:100%;background:var(--bg);border:1px solid var(--line-2);border-radius:6px;color:var(--ink);font-family:var(--font-voice);font-size:14.5px;line-height:1.5;padding:11px;resize:vertical;min-height:60px}
+  .editbox textarea:focus{outline:none;border-color:var(--ember)}
+  .editbox .erow{display:flex;gap:9px;margin-top:10px;align-items:center}
+  .editbox .ehint{font-family:var(--font-mono);font-size:10.5px;color:var(--mut);flex:1}
+
+  /* ---------- footer legend ---------- */
+  .legend{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(20,18,16,.94);backdrop-filter:blur(10px);border-top:1px solid var(--line);padding:12px 26px}
+  .legend-in{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  .keys{display:flex;gap:14px;flex-wrap:wrap}
+  .kk{font-family:var(--font-mono);font-size:11px;color:var(--mut);display:flex;align-items:center;gap:6px}
+  .kk kbd{font-family:var(--font-mono);font-size:10px;background:var(--surface);border:1px solid var(--line-2);border-bottom-width:2px;border-radius:4px;padding:2px 7px;color:var(--ink-2)}
+  .legend .spacer{flex:1}
+  .legend-stat{font-family:var(--font-mono);font-size:11.5px;color:var(--mut)}
+  .legend-stat b{color:var(--ink)}
+  .sbtn{font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:8px 16px;border-radius:6px;border:1px solid var(--ember);background:rgba(224,122,60,.12);color:var(--ember);cursor:pointer;transition:all .15s}
+  .sbtn:disabled{opacity:.35;cursor:not-allowed;border-color:var(--line-2);background:var(--surface);color:var(--mut)}
+  .sbtn:not(:disabled):hover{background:var(--ember);color:#1a120b}
+
+  /* ---------- summary overlay ---------- */
+  .summary{display:none;position:fixed;inset:0;z-index:70;background:var(--bg);overflow-y:auto;padding:0 0 60px}
+  .summary.open{display:block}
+  .sum-mast{border-bottom:1px solid var(--line);background:linear-gradient(180deg,var(--bg-2),transparent);padding:30px 0 22px}
+  .sum-mast .k{font-family:var(--font-mono);font-size:11px;letter-spacing:.34em;color:var(--ember-soft);text-transform:uppercase}
+  .sum-mast h2{font-family:var(--font-display);font-size:30px;font-weight:600;margin-top:9px;letter-spacing:.01em}
+  .sum-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:24px 0}
+  @media(max-width:720px){.sum-stats{grid-template-columns:repeat(2,1fr)}}
+  .sstat{border:1px solid var(--line);border-radius:var(--r);padding:16px;background:var(--surface)}
+  .sstat .sv{font-family:var(--font-display);font-size:32px;font-weight:600;line-height:1}
+  .sstat .sl{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin-top:8px}
+  .sstat.acc .sv{color:var(--accept)} .sstat.edt .sv{color:var(--ember)} .sstat.rej .sv{color:var(--reject)} .sstat.keep .sv{color:var(--ink)}
+
+  .sum-sec-h{font-family:var(--font-mono);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--ember-soft);margin:30px 0 13px;display:flex;align-items:center;gap:12px}
+  .sum-sec-h .rule{flex:1;height:1px;background:var(--line)}
+  .jsonbox{background:#100e0c;border:1px solid var(--line);border-radius:var(--r);overflow:auto;max-height:420px}
+  .jsonbox .jhead{font-family:var(--font-mono);font-size:10.5px;color:var(--mut);padding:10px 15px;border-bottom:1px solid var(--line);background:var(--surface);display:flex;justify-content:space-between}
+  .jsonbox pre{font-family:var(--font-mono);font-size:12px;line-height:1.6;padding:16px;color:var(--ink-2);white-space:pre;tab-size:2}
+  .j-key{color:var(--steel)} .j-str{color:var(--accept)} .j-acc{color:var(--accept)} .j-edt{color:var(--ember)} .j-rej{color:var(--reject)} .j-num{color:var(--warn)} .j-mut{color:var(--mut-2)}
+
+  /* coda session */
+  .coda{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+  .coda-top{padding:16px 18px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+  .coda-top .ct-meta{font-family:var(--font-mono);font-size:11px;color:var(--mut);letter-spacing:.06em;margin-bottom:11px}
+  .coda-top .ct-meta b{color:var(--ink-2)}
+  .coda-open{font-family:var(--font-voice);font-size:16px;line-height:1.6;color:var(--ink);border-left:2px solid var(--ember);padding-left:14px}
+  .coda-open .att{display:block;font-family:var(--font-mono);font-size:10px;color:var(--mut-2);margin-top:8px;letter-spacing:.06em;text-transform:uppercase}
+  .coda-block{padding:14px 18px;border-top:1px solid var(--line)}
+  .coda-block .cb-h{display:flex;align-items:center;gap:10px;margin-bottom:11px}
+  .coda-block .cb-t{font-family:var(--font-display);font-size:16px;font-weight:500}
+  .coda-block .cb-time{font-family:var(--font-mono);font-size:11px;color:var(--mut)}
+  .batch-tag{font-family:var(--font-mono);font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;background:rgba(224,122,60,.14);color:var(--ember);padding:3px 7px;border-radius:4px;border:1px solid rgba(224,122,60,.3)}
+  .assign{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  @media(max-width:680px){.assign{grid-template-columns:1fr}}
+  .who{border:1px solid var(--line);border-radius:7px;padding:10px 12px;background:var(--bg-2)}
+  .who .wn{font-family:var(--font-mono);font-size:10.5px;color:var(--mut);letter-spacing:.08em}
+  .who .we{font-family:var(--font-ui);font-size:13.5px;color:var(--ink-2);margin-top:5px;line-height:1.35}
+  .who .we .bt{display:inline-block;margin-top:5px}
+
+  .sum-actions{display:flex;gap:12px;margin-top:30px;flex-wrap:wrap}
+  .commit-note{font-family:var(--font-mono);font-size:11px;color:var(--mut);margin-top:14px;line-height:1.6;padding:12px 14px;border:1px dashed var(--line-2);border-radius:8px;background:var(--surface)}
+  .commit-note b{color:var(--ember-soft)}
+
+  .toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);z-index:80;background:var(--surface-2);border:1px solid var(--line-2);border-radius:8px;padding:11px 18px;font-family:var(--font-mono);font-size:12px;color:var(--ink);opacity:0;transition:all .25s;box-shadow:0 10px 30px rgba(0,0,0,.5);pointer-events:none}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+
+<div class="ribbon">Prototype · not a decision</div>
+
+<div class="summary" id="summary"></div>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="mast-top">
+      <div class="brand">
+        <span class="k">Library Authoring · Founder Review</span>
+        <h1>Batch Review Console</h1>
+      </div>
+      <div class="batch-id">
+        <div>batch <b>b-2026-07-18-vpull-u10</b></div>
+        <div>library <b>v0.4.2</b> · generator <b>gpt-batch/07</b></div>
+        <div>queued <b>Sat 18 Jul · 21:40</b></div>
+      </div>
+    </div>
+
+    <div class="brief">
+      <div class="lbl">Gap brief · from planner library-gap queue</div>
+      <div class="q">Easier vertical-pull variants for under-10s</div>
+      <div class="src">demand-driven · planner reports &lt;2 reachable rungs for Leo (10) &amp; Sam (8) in the Vertical Pull family · outranks speculative breadth</div>
+    </div>
+
+    <div class="telem">
+      <div class="panel">
+        <h2>Triage funnel <span class="disc" onclick="document.getElementById('rejlist').classList.toggle('open')">show auto-rejects ▾</span></h2>
+        <div class="funnel">
+          <div class="step gen"><span class="n">12</span><span class="s">generated</span></div>
+          <div class="arw">→</div>
+          <div class="step rej"><span class="n">4</span><span class="s">auto-rejected</span></div>
+          <div class="arw">→</div>
+          <div class="step rev"><span class="n">8</span><span class="s">for review</span></div>
+        </div>
+        <div class="rejects" id="rejlist">
+          <div class="rej-row"><div class="rn">Kipping Chin-Up</div><div class="rd"><span class="tag">metadata-incoherence</span> — age gate 13+ contradicts declared position (easier than Chin-Up, 9+). Can't be both easier and older-gated than its harder neighbor.</div></div>
+          <div class="rej-row"><div class="rn">Machine-Assisted Chin-Up</div><div class="rd"><span class="tag">schema/enum</span> — equipment "assisted-machine" is outside the fence (<span style="font-family:var(--font-mono)">none | pull-up bar</span>).</div></div>
+          <div class="rej-row"><div class="rn">Resistance-Band Chin-Up</div><div class="rd"><span class="tag">duplicate</span> — normalized name + cue text 96% overlap with approved "Band-Assisted Pull-Up." Exact dupe dies pre-review.</div></div>
+          <div class="rej-row"><div class="rn">Explosive Kip-Up</div><div class="rd"><span class="tag">sim-invariant</span> — H11 youth-safety: injects stacked max-effort into the under-11 roster in 3 of 3 sims. Hard auto-reject.</div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2>Keep-rate health <span id="keepnote-top" style="color:var(--mut-2)">awaiting decisions</span></h2>
+        <div class="meter-head">
+          <div class="meter-val" id="keepval">—<small> %</small></div>
+          <div class="meter-note" id="keepnote" style="color:var(--mut)">accept ÷ reviewed</div>
+        </div>
+        <div class="gauge">
+          <div class="zone z-red"></div><div class="zone z-ok"></div><div class="zone z-amber"></div>
+          <div class="fill" id="keepfill"></div>
+          <div class="needle" id="keepneedle" style="display:none"></div>
+        </div>
+        <div class="bands"><span>0 · broken</span><span>30 — healthy — 85</span><span>rubber-stamp · 100</span></div>
+      </div>
+    </div>
+
+    <div class="prog-wrap" style="padding-bottom:22px">
+      <div class="prog-head"><span>Review progress</span><span><b id="progn">0</b> / 8 decided</span></div>
+      <div class="prog"><div class="pf" id="progfill"></div></div>
+      <div class="tally">
+        <span class="ta"><b id="tacc">0</b>accepted</span>
+        <span class="te"><b id="tedt">0</b>edited</span>
+        <span class="tr"><b id="trej">0</b>rejected</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap" style="padding-top:8px">
+  <div class="group-head">
+    <span class="gt">Vertical Pull · under-10 gap</span>
+    <span class="gc">8 candidates · 5 exercises · 2 voice lines · 1 block</span>
+    <span class="rule"></span>
+  </div>
+  <div id="rows"></div>
+</main>
+
+<div class="legend">
+  <div class="legend-in">
+    <div class="keys">
+      <span class="kk"><kbd>j</kbd><kbd>k</kbd> move</span>
+      <span class="kk"><kbd>A</kbd> accept</span>
+      <span class="kk"><kbd>E</kbd> edit</span>
+      <span class="kk"><kbd>R</kbd> reject</span>
+      <span class="kk"><kbd>1</kbd>–<kbd>6</kbd> reason</span>
+      <span class="kk"><kbd>esc</kbd> cancel</span>
+    </div>
+    <span class="spacer"></span>
+    <span class="legend-stat">reviewed <b id="lg-rev">0</b>/8 · keep <b id="lg-keep">—</b></span>
+    <button class="sbtn" id="sumbtn" disabled onclick="openSummary()">Batch summary →</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------------- fake batch data ---------------- */
+const APPROVED = [
+  {name:'Dead Hang', d:1, age:'6+'},
+  {name:'Active Hang', d:2, age:'6+'},
+  {name:'Band-Assisted Pull-Up', d:4, age:'8+'},
+  {name:'Negative Pull-Up', d:6, age:'10+'},
+  {name:'Chin-Up', d:7, age:'9+'},
+  {name:'Pull-Up', d:8, age:'10+'},
+];
+
+const GOLD = {
+  'session-open':'Tuesday, 30 minutes, three of you. Two supersets and a squat finisher. Leo — full push-ups tonight; the incline earned you that.',
+  'kid-pb':'Sam — twelve push-ups. Best ever was nine. The Record Book just changed.'
+};
+
+const CANDS = [
+  // ---- E1 clean exercise ----
+  { id:'ex-001', type:'exercise', name:'Chair-Assisted Chin-Up',
+    sub:'feet on a chair for leg drive', pattern:'Vertical Pull',
+    after:'Active Hang', before:'Band-Assisted Pull-Up', d:3, age:'7+',
+    chips:[['pattern','Vertical Pull'],['equip','pull-up bar'],['metric','reps'],['age','7+'],['surface','sturdy chair'],['skill','Pull-Up · rung 2.5']],
+    cues:['Chin drives to the bar, chair takes only what you can’t.','Legs assist, they don’t launch — slow up, slow down.','Full hang at the bottom every rep.'],
+    safety:'Chair must be against a wall or held. Stop if shoulders shrug up to the ears under strain.',
+    rationale:'Fills the empty rung between an active hang and a band pull-up — legs give a tunable amount of help a band can’t.',
+    sim:{n:22,m:40,rosters:'Dad+Leo+Sam, Leo+Sam, solo Sam', warn:false},
+    flags:[] },
+
+  // ---- E3 mis-ordered (findable) ----
+  { id:'ex-002', type:'exercise', name:'Negative Chin-Up (5-count)',
+    sub:'slow 5s lower from the top', pattern:'Vertical Pull',
+    after:'Active Hang', before:'Band-Assisted Pull-Up', d:6, age:'11+',
+    chips:[['pattern','Vertical Pull'],['equip','pull-up bar'],['metric','reps'],['age','11+ ⚑'],['surface','box to reach top'],['skill','Pull-Up · rung 4?']],
+    cues:['Start with chin over the bar, lower for a slow five-count.','No dropping — the whole rep is the lower.'],
+    safety:'A controlled negative is near-max effort. Not for a first vertical-pull rung.',
+    rationale:'Adds a slow-eccentric option for the assisted band.',
+    sim:{n:0,m:40,rosters:'never selected in any under-10 roster — selection trace: true difficulty excludes the target ages', warn:true},
+    flags:['order'] },
+
+  // ---- E2 near-duplicate ----
+  { id:'ex-003', type:'exercise', name:'Box Jackknife Chin-Up',
+    sub:'feet on a box, jackknife assist', pattern:'Vertical Pull',
+    after:'Active Hang', before:'Band-Assisted Pull-Up', d:3, age:'7+',
+    chips:[['pattern','Vertical Pull'],['equip','pull-up bar'],['metric','reps'],['age','7+'],['surface','low box'],['skill','Pull-Up · rung 2.5']],
+    cues:['Feet on the box, push just enough to clear the sticking point.','Same tempo as an unassisted chin — no bouncing off the box.'],
+    safety:'Box height set so the bar is reachable with a soft bend, not a jump.',
+    rationale:'Box version of the leg-assisted chin for families without a sturdy chair.',
+    sim:{n:9,m:40,rosters:'Leo+Sam, solo Sam — splits selection share with ex-001', warn:false},
+    similar:{to:'Chair-Assisted Chin-Up (ex-001)', pct:71, distinct:false,
+      note:'Same movement, same rung, same cues — leg-assist off a raised surface. Cue overlap 71% inside the (Vertical Pull, bar, reps) cell. Not chain-distinct from ex-001.'},
+    flags:['dup'] },
+
+  // ---- E4 clean-but-edit (low-conf time model) ----
+  { id:'ex-004', type:'exercise', name:'Heavy-Band Pull-Up',
+    sub:'thick band — more assist than the standard band', pattern:'Vertical Pull',
+    after:'Active Hang', before:'Band-Assisted Pull-Up', d:3, age:'8+',
+    chips:[['pattern','Vertical Pull'],['equip','pull-up bar + band'],['metric','reps'],['age','8+'],['surface','—'],['skill','Pull-Up · rung 2.5'],['time','~40s/set ⚑ low-conf']],
+    cues:['Thick band means more help — that’s the point at this rung.','Foot or knee in the band, full lockout at the bottom.'],
+    safety:'Set the band before stepping in; keep tension controlled so it can’t snap back.',
+    rationale:'A heavier band gives a genuinely easier band-pull for the lightest members. Time-model was flagged low-confidence — model unsure of set duration for kids.',
+    sim:{n:16,m:40,rosters:'Dad+Leo+Sam, Leo+Sam', warn:false},
+    flags:['lowconf'] },
+
+  // ---- E5 clean, chain-distinct near-relative ----
+  { id:'ex-005', type:'exercise', name:'Towel-Assisted Chin-Up',
+    sub:'pull on a towel over the bar, feet down', pattern:'Vertical Pull',
+    after:'Active Hang', before:'Band-Assisted Pull-Up', d:3, age:'7+',
+    chips:[['pattern','Vertical Pull'],['equip','pull-up bar + towel'],['metric','reps'],['age','7+'],['surface','hand towel'],['skill','Pull-Up · rung 2.5']],
+    cues:['Grip the towel, feet stay down, pull the chin toward the bar.','Assist comes from the legs pushing off the floor, not swinging.'],
+    safety:'Test the towel holds before loading. Feet stay under the bar, never behind.',
+    rationale:'Different failure mode than the chair/box variants — teaches grip and a straighter body line. Chain-distinct despite the family resemblance.',
+    sim:{n:14,m:40,rosters:'Leo+Sam, solo Sam, solo Leo', warn:false},
+    similar:{to:'Chair-Assisted Chin-Up (ex-001)', pct:44, distinct:true,
+      note:'Self-declared similar_to ex-001, but the assist mechanism (grip + floor push vs. chair) is genuinely different — below the 55% dupe threshold. Chain-distinct: survives.'},
+    flags:[] },
+
+  // ---- V1 clean voice ----
+  { id:'vx-001', type:'voice', name:'Session-open line',
+    sub:'moment: session open · register: under-10 (Leo)', moment:'session-open', clean:true,
+    candidate:'Thirty minutes, three of you. Two pull blocks and a core finisher. Leo — chair chin-ups tonight; the active hang earned you that.',
+    slots:'{minutes}=30 · {roster_count}=three · {name}=Leo · {new_exercise}=chair chin-ups · {prev_rung}=active hang',
+    lint:{ok:true, items:[
+      ['clipboard-not-camera','States only what the log holds — "the active hang earned you that" is a logged rung, not an observation.'],
+      ['specificity','Names one thing specific to tonight (Leo’s new rung). Not sayable to any other family — passes the Amnesiac rule.'],
+      ['register','Short, one idea per clause, full athletic vocabulary un-glossed. Sayable to an adult without embarrassment.']
+    ]},
+    flags:[] },
+
+  // ---- V2 dirty voice (findable violations) ----
+  { id:'vx-002', type:'voice', name:'Kid PB line',
+    sub:'moment: a kid’s PB · register: under-10 (Sam)', moment:'kid-pb', clean:false,
+    candidateHTML:'Twelve chin-ups, Sam — <span class="hl" title="Fabricator: the coach reads the log, it never watches">I watched every rep, all clean</span>. <span class="hl" title="Sibling comparison: banned in any framing">Even Ryan couldn’t do that at eight</span>. <span class="hl" title="Entertainer + banned lexicon">Level up!</span>',
+    slots:'{name}=Sam · {reps}=12 · {prev_best}=9 (unused — the line never names the record)',
+    lint:{ok:false, items:[
+      ['fabricator','"I watched every rep, all clean" — the coach reads the log, it never claims to see or judge form. Clipboard, not camera. (coach-voice §2.1)'],
+      ['sibling-comparison','"Even Ryan couldn’t do that at eight" — a sibling used as another child’s benchmark. Never, in any framing. (coach-voice §5)'],
+      ['not-real-vocabulary','"Level up!" — banned lexicon + Entertainer/XP register. The coach is athletic, never gamey. (coach-voice §1)'],
+      ['amnesiac','Never names the record it beat — the whole point of a PB moment. The golden leads with the number and the history.']
+    ]},
+    flags:['lint'] },
+
+  // ---- B1 block ----
+  { id:'bk-001', type:'block', name:'Assisted Pull Ladder',
+    sub:'circuit · 3 rounds · everyone on their own rung', structure:'circuit',
+    slots:[
+      ['Assisted Vertical Pull','8 reps · per-member rung'],
+      ['Hollow Hold','20s'],
+      ['Scapular Pull','6 reps']
+    ],
+    rest:'45s between rounds', suit:'2–4 members · ages 7–adult · works down to a kids-only roster',
+    benchmark:'not benchmark-eligible (per-member rung varies the load)',
+    estMin:9.5, realMin:11.2, realP95:13.4,
+    tmVerdict:'Sim realized median 11.2 min vs. 9.5 estimate — over by ~1.7 min. The per-member swap-and-reset eats time the model didn’t price. Edit the time-model transition constant before accept.',
+    flags:['lowconf'] },
+];
+
+/* ---------------- state ---------------- */
+const state = {};
+CANDS.forEach(c=> state[c.id]={decision:null, reasons:[], edited:null});
+let focusIdx = 0;
+let mode = null; // null | 'reject' | 'edit'
+
+const REASONS = [
+  ['mislabeled-difficulty','1'],['unsafe-cue','2'],['not-real-vocabulary','3'],
+  ['duplicate','4'],["my-family-wouldn't",'5'],['voice-off','6']
+];
+
+/* ---------------- chain strip builder ---------------- */
+function chainStrip(c, decided){
+  const seq=[];
+  APPROVED.forEach(r=>{
+    seq.push({...r, kind:'approved'});
+    if(r.name===c.after){
+      seq.push({name:c.name, d:c.d, age:c.age, kind:'cand'});
+    }
+  });
+  // monotonic + age check
+  const ai = seq.findIndex(s=>s.kind==='cand');
+  const prev = seq[ai-1], next = seq[ai+1];
+  const cand = seq[ai];
+  const monoBad = !(prev.d < cand.d && cand.d < next.d);
+  const candAgeN = parseInt(cand.age), nextAgeN = parseInt(next.age);
+  const ageBad = candAgeN > nextAgeN; // gated older than its harder neighbor
+  const bad = monoBad || ageBad;
+
+  let html='<div class="chain">';
+  seq.forEach(s=>{
+    if(s.kind==='approved'){
+      html+=`<div class="rung approved"><div class="rname">${s.name}</div>
+        <div class="meta"><span class="dd">d${s.d}</span><span>${s.age}</span></div></div>`;
+    } else {
+      const cls = bad?'bad':(decided==='accept'||decided==='edit'?'ok-accepted':'');
+      html+=`<div class="rung cand ${cls}"><span class="youtag">candidate</span>
+        <div class="rname">${s.name}</div>
+        <div class="meta"><span class="dd">d${s.d}</span><span>${s.age}</span></div></div>`;
+    }
+  });
+  html+='</div>';
+
+  if(bad){
+    let msg='';
+    if(monoBad) msg+=`Difficulty jumps out of order: <b>d${prev.d} → d${cand.d} → d${next.d}</b> is non-monotonic. `;
+    if(ageBad) msg+=`Age-gate inversion: declared <b>easier</b> than ${next.name} (${next.age}) but gated <b>${cand.age}</b> — older than its harder neighbor. `;
+    html+=`<div class="chain-verdict bad">⚑ Mis-ordered chain — ${msg}This silently breaks H5 roster coverage and mid-workout swaps.</div>`;
+  } else {
+    html+=`<div class="chain-verdict ok">✓ Monotonic: d${prev.d} → <b>d${cand.d}</b> → d${next.d}. Age gates non-decreasing. Slots honestly between its declared neighbors.</div>`;
+  }
+  return html;
+}
+
+/* ---------------- card renderers ---------------- */
+function chipRow(chips){
+  return '<div class="chips">'+chips.map(([k,v])=>`<span class="chip"><span class="ck">${k}</span>${v}</span>`).join('')+'</div>';
+}
+function exerciseCard(c, decided){
+  const simCls = c.sim.warn?'sim warn-sel':'sim';
+  const simMsg = c.sim.warn
+    ? `<b>Selected in ${c.sim.n} of ${c.sim.m}</b> synthetic sessions`
+    : `Selected in <b>${c.sim.n} of ${c.sim.m}</b> synthetic sessions`;
+  let simil='';
+  if(c.similar){
+    const dc = c.similar.distinct?' distinct':'';
+    simil=`<div class="simil${dc}"><span class="st">${c.similar.distinct?'◈ similarity noted — chain-distinct':'⚠ near-duplicate — '+c.similar.pct+'% overlap'}</span> · ${c.similar.note}</div>`;
+  }
+  return `
+  <div class="sec"><div class="sh">Chain strip — family rungs in order, candidate between declared neighbors</div>
+    ${chainStrip(c, decided)}</div>
+  <div class="card-grid">
+    <div>
+      <div class="sec"><div class="sh">Form cues</div><ul class="cues">${c.cues.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+      <div class="sec"><div class="sh">Safety note</div><div class="safety"><span class="sk">non-negotiable</span>${c.safety}</div></div>
+    </div>
+    <div>
+      <div class="sec"><div class="sh">Metadata</div>${chipRow(c.chips)}</div>
+      <div class="sec"><div class="sh">Authoring rationale</div><div class="rationale">${c.rationale}</div></div>
+      <div class="sec"><div class="sh">Simulation evidence</div>
+        <div class="${simCls}"><div class="big">${simMsg}</div><div class="rosters">rosters: ${c.sim.rosters}</div></div>
+        ${simil}
+      </div>
+    </div>
+  </div>`;
+}
+function voiceCard(c){
+  const candBody = c.clean ? c.candidate : c.candidateHTML;
+  const candCls = c.clean?'cand clean':'cand dirty';
+  const lintCls = c.lint.ok?'lint clean':'lint';
+  const lintRows = c.lint.items.map(([n,d])=>{
+    const mark = c.lint.ok?'<span class="lok">✓</span>':'<span class="lx">✕</span>';
+    return `<div class="lrow">${mark}<span class="lname">${n}</span><span class="ldesc">${d}</span></div>`;
+  }).join('');
+  return `
+  <div class="voice-cols">
+    <div class="vcol ${candCls}">
+      <div class="vlbl"><span class="pip"></span>Candidate — slot-filled, canonical family</div>
+      <div class="vline">${candBody}</div>
+    </div>
+    <div class="vcol gold">
+      <div class="vlbl"><span class="pip"></span>Golden line — this moment × register</div>
+      <div class="vline">${GOLD[c.moment]}</div>
+    </div>
+  </div>
+  <div class="sec" style="margin-top:16px"><div class="sh">Slots</div>
+    <div class="chip" style="display:inline-block;line-height:1.6">${c.slots}</div></div>
+  <div class="sec"><div class="sh">Voice-lint ${c.lint.ok?'— clean':'— '+c.lint.items.length+' violations, match-or-beat fails'}</div>
+    <div class="${lintCls}">${lintRows}</div></div>`;
+}
+function blockCard(c){
+  const estPct=(c.estMin/16*100), realPct=(c.realMin/16*100);
+  return `
+  <div class="card-grid">
+    <div>
+      <div class="sec"><div class="sh">Structure — ${c.structure} · 3 rounds</div>
+        <div class="blockdiag">
+          <div class="bd-head"><span>${c.name}</span><span>${c.structure}</span></div>
+          ${c.slots.map((s,i)=>`<div class="bd-slot"><span class="bn">${i+1}</span><span class="bx">${s[0]}</span><span class="bs">${s[1]}</span></div>`).join('')}
+          <div class="bd-foot">${c.rest} · ${c.suit}</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="sec"><div class="sh">Time model — estimate vs. sim realized</div>
+        <div class="timemodel">
+          <div class="chip" style="display:inline-block;margin-bottom:4px">estimate <b style="color:var(--steel)">${c.estMin} min</b></div>
+          <div class="tm-bar">
+            <div class="tm-est" style="width:${estPct}%">est ${c.estMin}m</div>
+            <div class="tm-real" style="width:${realPct}%"><span>sim median ${c.realMin}m · p95 ${c.realP95}m</span></div>
+          </div>
+          <div class="tm-verdict">⚑ ${c.tmVerdict}</div>
+        </div>
+      </div>
+      <div class="sec"><div class="sh">Suitability</div>
+        ${chipRow([['members','2–4'],['ages','7–adult'],['benchmark','no'],['kids-only','ok']])}
+        <div class="rationale" style="margin-top:11px">${c.benchmark}</div>
+      </div>
+    </div>
+  </div>`;
+}
+
+/* ---------------- row / actions ---------------- */
+function actionsBlock(c){
+  const st=state[c.id];
+  if(st.decision){
+    let label = st.decision==='accept'?'accepted'
+      : st.decision==='edit'?'edited &amp; accepted'
+      : 'rejected — '+st.reasons.join(', ');
+    let extra = st.edited?`<div class="rationale" style="margin-top:10px;border-color:var(--ember)">edit: “${st.edited}”</div>`:'';
+    return `<div class="actions"><span class="decided-note">decision: <b>${label}</b></span>
+      <span class="spacer"></span>
+      <button class="abtn" onclick="reopen('${c.id}')">undo <span class="key">u</span></button></div>${extra}`;
+  }
+  return `<div class="actions">
+    <button class="abtn acc" onclick="decide('${c.id}','accept')">accept <span class="key">A</span></button>
+    <button class="abtn edt" onclick="startEdit('${c.id}')">edit-then-accept <span class="key">E</span></button>
+    <button class="abtn rej" onclick="startReject('${c.id}')">reject <span class="key">R</span></button>
+    <span class="spacer"></span>
+  </div>
+  <div class="reasons" id="reasons-${c.id}">
+    <div class="rt-head">reject reason — tags feed few-shot negatives &amp; future triage rules</div>
+    ${REASONS.map(([r,k])=>`<button class="rtag" onclick="pickReason('${c.id}','${r}')"><span class="rk">${k}</span>${r}</button>`).join('')}
+  </div>
+  <div class="editbox" id="editbox-${c.id}">
+    <div class="eh">edit — fix, then it counts as an accept (with a diff)</div>
+    <textarea id="edittext-${c.id}">${editSeed(c)}</textarea>
+    <div class="erow"><span class="ehint">⌘/Ctrl + Enter to save · esc to cancel</span>
+      <button class="abtn edt" onclick="saveEdit('${c.id}')">save &amp; accept</button></div>
+  </div>`;
+}
+function editSeed(c){
+  if(c.type==='voice') return c.clean?c.candidate:'Twelve chin-ups, Sam. Best ever was nine. The Record Book just changed.';
+  if(c.type==='block') return 'time_model.transition_constant: 6s → 12s (price the per-member swap-and-reset)';
+  if(c.id==='ex-002') return 'declared position: after "Band-Assisted Pull-Up", before "Chin-Up"; age 11+ (re-slot to true difficulty d6)';
+  return c.name;
+}
+
+function cardBody(c){
+  if(c.type==='exercise') return exerciseCard(c, state[c.id].decision);
+  if(c.type==='voice') return voiceCard(c);
+  return blockCard(c);
+}
+
+function render(){
+  const rows = CANDS.map((c,i)=>{
+    const st=state[c.id];
+    const open = i===focusIdx;
+    const focusCls = i===focusIdx?' focus':'';
+    let doneCls='';
+    if(st.decision==='accept') doneCls=' done-accept';
+    else if(st.decision==='edit') doneCls=' done-edit';
+    else if(st.decision==='reject') doneCls=' done-reject';
+    const badge = !st.decision?'<span class="badge pending">pending</span>'
+      : st.decision==='accept'?'<span class="badge b-accept">accept</span>'
+      : st.decision==='edit'?'<span class="badge b-edit">edited</span>'
+      : '<span class="badge b-reject">reject</span>';
+    const flags = (c.flags||[]).map(f=>{
+      const m={order:['f-order','⚑ mis-ordered'],dup:['f-dup','⚠ near-dup'],lint:['f-lint','✕ voice-lint'],lowconf:['f-lowconf','low-conf']};
+      return `<span class="flag ${m[f][0]}">${m[f][1]}</span>`;
+    }).join('');
+    return `<div class="row${open?' open':''}${focusCls}${doneCls}" id="row-${c.id}" data-i="${i}">
+      <div class="rowhead" onclick="focusRow(${i})">
+        <span class="idx">${String(i+1).padStart(2,'0')}</span>
+        <span class="type-chip type-${c.type}">${c.type}</span>
+        <span class="rowname">${c.name}<span class="sub">${c.sub}</span></span>
+        <span class="flags">${flags}</span>
+        ${badge}
+        <span class="caret">▶</span>
+      </div>
+      <div class="card">${cardBody(c)}${actionsBlock(c)}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('rows').innerHTML = rows;
+  updateMeters();
+}
+
+/* ---------------- decisions ---------------- */
+function focusRow(i){ mode=null; focusIdx=i; render(); scrollToFocus(); }
+function scrollToFocus(){
+  const el=document.getElementById('row-'+CANDS[focusIdx].id);
+  if(el){ const r=el.getBoundingClientRect(); if(r.top<90||r.bottom>window.innerHeight-100) el.scrollIntoView({behavior:'smooth',block:'center'}); }
+}
+function decide(id, kind){ state[id].decision=kind; state[id].reasons=[]; mode=null; toast(kind==='accept'?'Accepted — nominated for the acceptance run':'saved'); advance(); }
+function startReject(id){ mode='reject'; render(); const r=document.getElementById('reasons-'+id); if(r) r.classList.add('open'); }
+function pickReason(id, reason){ state[id].decision='reject'; state[id].reasons=[reason]; mode=null; toast('Rejected · '+reason+' → few-shot negatives'); advance(); }
+function startEdit(id){ mode='edit'; render(); const e=document.getElementById('editbox-'+id); if(e){ e.classList.add('open'); const t=document.getElementById('edittext-'+id); if(t){t.focus();} } }
+function saveEdit(id){ const t=document.getElementById('edittext-'+id); state[id].edited=t?t.value.trim():''; state[id].decision='edit'; mode=null; toast('Edited & accepted — diff logged'); advance(); }
+function reopen(id){ state[id].decision=null; state[id].reasons=[]; state[id].edited=null; mode=null; render(); }
+function advance(){
+  const next = CANDS.findIndex((c,i)=> i>focusIdx && !state[c.id].decision);
+  if(next>=0) focusIdx=next;
+  else { const any=CANDS.findIndex(c=>!state[c.id].decision); if(any>=0) focusIdx=any; }
+  render(); scrollToFocus();
+}
+
+/* ---------------- meters ---------------- */
+function counts(){
+  let acc=0,edt=0,rej=0;
+  CANDS.forEach(c=>{const d=state[c.id].decision; if(d==='accept')acc++; else if(d==='edit')edt++; else if(d==='reject')rej++;});
+  return {acc,edt,rej,reviewed:acc+edt+rej};
+}
+function updateMeters(){
+  const {acc,edt,rej,reviewed}=counts();
+  const kept=acc+edt;
+  document.getElementById('tacc').textContent=acc;
+  document.getElementById('tedt').textContent=edt;
+  document.getElementById('trej').textContent=rej;
+  document.getElementById('progn').textContent=reviewed;
+  document.getElementById('progfill').style.width=(reviewed/8*100)+'%';
+  document.getElementById('lg-rev').textContent=reviewed;
+
+  const kv=document.getElementById('keepval'), kn=document.getElementById('keepnote'), knt=document.getElementById('keepnote-top');
+  const fill=document.getElementById('keepfill'), needle=document.getElementById('keepneedle'), lgk=document.getElementById('lg-keep');
+  if(reviewed===0){
+    kv.innerHTML='—<small> %</small>'; fill.style.width='0'; needle.style.display='none';
+    kn.textContent='accept ÷ reviewed'; kn.style.color='var(--mut)'; knt.textContent='awaiting decisions'; lgk.textContent='—';
+  } else {
+    const rate=Math.round(kept/reviewed*100);
+    kv.innerHTML=rate+'<small> %</small>';
+    fill.style.width=rate+'%'; needle.style.display='block'; needle.style.left=rate+'%';
+    lgk.textContent=rate+'%';
+    let note,col;
+    if(rate<30){note='⚑ below 30 — generation/triage broken, fix the prompt';col='var(--reject)';}
+    else if(rate>85){note='⚑ above 85 — bar dropped or rubber-stamping';col='var(--warn)';}
+    else {note='✓ healthy band (30–85)';col='var(--accept)';}
+    kn.textContent=note; kn.style.color=col; kv.style.color=col;
+    knt.textContent=reviewed<8?`${reviewed}/8 reviewed`:'batch complete';
+  }
+  const done=reviewed===8;
+  document.getElementById('sumbtn').disabled=!done;
+}
+
+/* ---------------- keyboard ---------------- */
+document.addEventListener('keydown', e=>{
+  if(document.getElementById('summary').classList.contains('open')){
+    if(e.key==='Escape') closeSummary();
+    return;
+  }
+  const id=CANDS[focusIdx].id, tag=(e.target.tagName||'').toLowerCase();
+  if(tag==='textarea'){
+    if(e.key==='Escape'){ mode=null; render(); }
+    if((e.metaKey||e.ctrlKey)&&e.key==='Enter'){ e.preventDefault(); saveEdit(id); }
+    return;
+  }
+  if(mode==='reject' && /^[1-6]$/.test(e.key)){ e.preventDefault(); pickReason(id, REASONS[+e.key-1][0]); return; }
+  switch(e.key){
+    case 'j': e.preventDefault(); if(focusIdx<CANDS.length-1){focusIdx++;mode=null;render();scrollToFocus();} break;
+    case 'k': e.preventDefault(); if(focusIdx>0){focusIdx--;mode=null;render();scrollToFocus();} break;
+    case 'a': case 'A': e.preventDefault(); if(!state[id].decision) decide(id,'accept'); break;
+    case 'e': case 'E': e.preventDefault(); if(!state[id].decision) startEdit(id); break;
+    case 'r': case 'R': e.preventDefault(); if(!state[id].decision) startReject(id); break;
+    case 'u': case 'U': e.preventDefault(); if(state[id].decision) reopen(id); break;
+    case 'Escape': mode=null; render(); break;
+    case 's': case 'S': if(counts().reviewed===8) openSummary(); break;
+  }
+});
+
+/* ---------------- toast ---------------- */
+let toastT;
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),1600); }
+
+/* ---------------- summary ---------------- */
+function jsonLine(c){
+  const st=state[c.id];
+  const dCls = st.decision==='accept'?'j-acc':st.decision==='edit'?'j-edt':'j-rej';
+  let extra='';
+  if(st.decision==='reject') extra=`, <span class="j-key">"reason"</span>: <span class="j-rej">[${st.reasons.map(r=>'"'+r+'"').join(', ')}]</span>`;
+  if(st.decision==='edit') extra=`, <span class="j-key">"edit"</span>: <span class="j-str">"${(st.edited||'').replace(/"/g,'\\"').slice(0,64)}${(st.edited||'').length>64?'…':''}"</span>`;
+  return `  { <span class="j-key">"id"</span>: <span class="j-str">"${c.id}"</span>, <span class="j-key">"type"</span>: <span class="j-mut">"${c.type}"</span>, <span class="j-key">"decision"</span>: <span class="${dCls}">"${st.decision}"</span>${extra} }`;
+}
+function openSummary(){
+  const {acc,edt,rej}=counts(); const kept=acc+edt; const rate=Math.round(kept/8*100);
+  const accepted = CANDS.filter(c=>state[c.id].decision==='accept'||state[c.id].decision==='edit');
+  const jsonBody = CANDS.map(jsonLine).join(',\n');
+  const json = `{\n  <span class="j-key">"batch"</span>: <span class="j-str">"b-2026-07-18-vpull-u10"</span>,\n  <span class="j-key">"base_library"</span>: <span class="j-str">"v0.4.2"</span>,\n  <span class="j-key">"reviewer"</span>: <span class="j-str">"founder"</span>,\n  <span class="j-key">"keep_rate"</span>: <span class="j-num">${(kept/8).toFixed(2)}</span>,\n  <span class="j-key">"decisions"</span>: [\n${jsonBody}\n  ]\n}`;
+
+  let bandNote, bandCol;
+  if(rate<30){bandNote='below 30 — halt queue, fix generation before next sitting';bandCol='var(--reject)';}
+  else if(rate>85){bandNote='above 85 — check the bar didn’t drop';bandCol='var(--warn)';}
+  else {bandNote='healthy band — queue proceeds to the acceptance run';bandCol='var(--accept)';}
+
+  const acceptedNames = accepted.map(c=>c.name);
+  const hasE1=accepted.some(c=>c.id==='ex-001');
+  const hasE5=accepted.some(c=>c.id==='ex-005');
+  const hasB1=accepted.some(c=>c.id==='bk-001');
+  const hasV1=accepted.some(c=>c.id==='vx-001');
+
+  const codaOpen = hasV1
+    ? '“Thirty minutes, three of you. Two pull blocks and a core finisher. Leo — chair chin-ups tonight; the active hang earned you that.”'
+    : '“Thirty minutes, three of you. Pull day. Everyone in on their own rung.”';
+
+  document.getElementById('summary').innerHTML = `
+  <div class="sum-mast"><div class="wrap">
+    <div class="k">End of batch · what would be committed</div>
+    <h2>Batch summary — vertical-pull, under-10</h2>
+  </div></div>
+  <div class="wrap">
+    <div class="sum-stats">
+      <div class="sstat acc"><div class="sv">${acc}</div><div class="sl">accepted</div></div>
+      <div class="sstat edt"><div class="sv">${edt}</div><div class="sl">edited &amp; accepted</div></div>
+      <div class="sstat rej"><div class="sv">${rej}</div><div class="sl">rejected</div></div>
+      <div class="sstat keep"><div class="sv" style="color:${bandCol}">${rate}<small style="font-size:16px;color:var(--mut)">%</small></div><div class="sl">keep rate</div></div>
+    </div>
+    <div style="font-family:var(--font-mono);font-size:12px;color:${bandCol};margin:-8px 0 8px">◆ ${bandNote}</div>
+
+    <div class="sum-sec-h"><span>decisions.json — written back as a commit; merge script applies it</span><span class="rule"></span></div>
+    <div class="jsonbox"><div class="jhead"><span>packages/library/batches/b-2026-07-18-vpull-u10.decisions.json</span><span>git · library stays master</span></div><pre>${json}</pre></div>
+    <div class="commit-note">On commit the batch runs the <b>acceptance stack</b> before anything merges: property tests (H1–H11), 8-week longitudinal sim across roster shapes, selection-share report (do accepted items get picked / does any veteran starve), golden-session replay. A clean run mints library <b>v0.4.3</b>. Rejects &amp; their reason tags append to the few-shot negatives log for the next batch. <b>Prototype:</b> no commit is actually made.</div>
+
+    <div class="sum-sec-h"><span>Batch coda — accepted items in a real session</span><span class="rule"></span></div>
+    <div class="coda">
+      <div class="coda-top">
+        <div class="ct-meta">sim-generated · roster <b>Dad (42) · Leo (10) · Sam (8)</b> · time dial <b>30 min</b> · seed <b>0x4f2a</b> · library <b>v0.4.3</b></div>
+        <div class="coda-open">${codaOpen}<span class="att">${hasV1?'coach line: vx-001 (accepted this batch) · Tier 1 slot-fill, offline':'coach line: hand-authored starter set'}</span></div>
+      </div>
+      <div class="coda-block">
+        <div class="cb-h"><span class="cb-t">Warm-up</span><span class="cb-time">4 min</span></div>
+        <div class="who" style="grid-column:1/-1"><span class="we">Wrist &amp; shoulder prep · 2 rounds · shared</span></div>
+      </div>
+      <div class="coda-block">
+        <div class="cb-h"><span class="cb-t">Block 1 — Assisted Pull Ladder</span><span class="cb-time">${hasB1?'~11 min':'12 min'}</span>${hasB1?'<span class="batch-tag">from this batch · bk-001</span>':''}</div>
+        <div class="assign">
+          <div class="who"><span class="wn">Dad</span><div class="we">Pull-Up ×8<span class="bt"></span></div></div>
+          <div class="who"><span class="wn">Leo (10)</span><div class="we">${hasE1?'Chair-Assisted Chin-Up':'Band-Assisted Pull-Up'} ×8<span class="bt">${hasE1?'<span class="batch-tag">ex-001</span>':''}</span></div></div>
+          <div class="who"><span class="wn">Sam (8)</span><div class="we">${hasE5?'Towel-Assisted Chin-Up':'Active Hang'} ×8<span class="bt">${hasE5?'<span class="batch-tag">ex-005</span>':''}</span></div></div>
+        </div>
+      </div>
+      <div class="coda-block">
+        <div class="cb-h"><span class="cb-t">Block 2 — Push + Core superset</span><span class="cb-time">10 min</span></div>
+        <div class="assign">
+          <div class="who"><span class="wn">Dad</span><div class="we">Push-Up ×12 / Hollow Hold 30s</div></div>
+          <div class="who"><span class="wn">Leo</span><div class="we">Push-Up ×10 / Hollow Hold 20s</div></div>
+          <div class="who"><span class="wn">Sam</span><div class="we">Knee Push-Up ×10 / Tuck Hold 15s</div></div>
+        </div>
+      </div>
+      <div class="coda-block">
+        <div class="cb-h"><span class="cb-t">Finisher — Squat ladder</span><span class="cb-time">5 min</span></div>
+        <div class="who" style="grid-column:1/-1"><span class="we">Air-Squat countdown 10→1 · shared · whoever’s moving is winning</span></div>
+      </div>
+    </div>
+    <div class="commit-note" style="margin-top:14px">Accepted this batch and now live in the session above: <b>${acceptedNames.length?acceptedNames.join(', '):'(nothing accepted)'}</b>. This is the coda’s job — a labeling error that survived the cards shows up here, sitting next to real neighbors in a real 30-minute budget.</div>
+
+    <div class="sum-actions">
+      <button class="abtn edt" onclick="closeSummary()">← back to batch</button>
+      <button class="sbtn" onclick="toast('Prototype — no commit made')">Commit decisions &amp; run acceptance stack</button>
+    </div>
+  </div>`;
+  document.getElementById('summary').classList.add('open');
+  window.scrollTo(0,0);
+}
+function closeSummary(){ document.getElementById('summary').classList.remove('open'); }
+
+render();
+</script>

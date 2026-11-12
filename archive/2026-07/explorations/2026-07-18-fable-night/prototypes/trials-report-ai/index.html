@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>October Trials — The Griffins</title>
+<style>
+  /* ============================================================
+     Trials Report — keepsake card. PROTOTYPE, 2026-07-18 Fable night.
+     Self-contained, print-friendly, zero external requests.
+     Deliberate single look: a warm pressed-paper record-book card —
+     the gym wall where records get chalked, made portable.
+     ============================================================ */
+
+  :root{
+    --paper:#f2ece0;
+    --paper-edge:#e7dfce;
+    --ink:#221f19;
+    --ink-soft:#5c5648;
+    --ink-faint:#8a8272;
+    --hair:rgba(34,31,25,.14);
+    --hair-strong:rgba(34,31,25,.28);
+    --slate:#1d2830;
+    --chalk:#ece5d6;
+    --amber:#b0742a;         /* Progress Points accent */
+    --sam:#c9821f;
+    --leo:#3f918c;
+    --ryan:#b34c33;
+    --dad:#3a577c;
+    --serif:"Hoefler Text","Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --sans:"Optima","Gill Sans","Gill Sans MT",Avenir,"Segoe UI",-apple-system,BlinkMacSystemFont,sans-serif;
+    --mono:"SFMono-Regular",ui-monospace,"IBM Plex Mono",Menlo,Consolas,monospace;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:
+      radial-gradient(120% 80% at 50% -10%, #f7f2e8 0%, var(--paper) 55%, var(--paper-edge) 100%);
+    color:var(--ink);
+    font-family:var(--sans);
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+    padding:40px 20px 64px;
+    min-height:100vh;
+  }
+
+  .card{
+    max-width:660px;
+    margin:0 auto;
+    background:var(--paper);
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(34,31,25,.012) 3px, rgba(34,31,25,.012) 4px),
+      radial-gradient(140% 60% at 20% 0%, rgba(255,255,255,.5), transparent 60%);
+    border:1px solid var(--hair);
+    border-radius:3px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,.6) inset,
+      0 24px 48px -28px rgba(29,40,48,.45),
+      0 2px 8px -4px rgba(29,40,48,.25);
+    overflow:hidden;
+  }
+
+  /* ---- masthead ---------------------------------------------- */
+  .masthead{
+    background:
+      linear-gradient(180deg, #22303a 0%, var(--slate) 70%, #1a242b 100%);
+    color:var(--chalk);
+    padding:30px 40px 26px;
+    position:relative;
+  }
+  .masthead::after{ /* chalk dust hairline */
+    content:"";position:absolute;left:40px;right:40px;bottom:0;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(236,229,214,.35),transparent);
+  }
+  .eyebrow{
+    font-family:var(--sans);
+    font-size:11px;letter-spacing:.32em;text-transform:uppercase;
+    color:rgba(236,229,214,.62);margin:0 0 14px;font-weight:600;
+  }
+  .family-name{
+    font-family:var(--serif);
+    font-size:clamp(30px,7vw,44px);line-height:1;margin:0;
+    font-weight:500;letter-spacing:.005em;
+  }
+  .trials-line{
+    display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;
+    margin-top:10px;color:rgba(236,229,214,.78);
+  }
+  .trials-line .month{font-family:var(--serif);font-style:italic;font-size:19px}
+  .trials-line .dot{opacity:.4}
+  .trials-line .win{font-family:var(--mono);font-size:12px;letter-spacing:.04em;color:rgba(236,229,214,.6)}
+
+  /* ---- headline / hero PP ------------------------------------ */
+  .hero{
+    display:flex;align-items:center;gap:24px;
+    padding:28px 40px 24px;
+    border-bottom:1px solid var(--hair);
+  }
+  .pp-badge{
+    flex:0 0 auto;text-align:center;
+    padding:14px 20px;border:1.5px solid var(--amber);border-radius:2px;
+    background:linear-gradient(180deg, rgba(176,116,42,.08), rgba(176,116,42,.02));
+  }
+  .pp-num{
+    font-family:var(--mono);font-size:46px;line-height:.9;color:var(--amber);
+    font-weight:600;letter-spacing:-.02em;
+  }
+  .pp-label{
+    font-family:var(--sans);font-size:9.5px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--amber);margin-top:7px;font-weight:700;
+  }
+  .hero-copy{font-family:var(--serif);font-size:20px;line-height:1.32;color:var(--ink)}
+  .hero-copy b{color:var(--amber);font-weight:600;font-style:normal}
+
+  /* ---- coach letter ------------------------------------------ */
+  .letter{padding:26px 40px 6px}
+  .member{
+    position:relative;padding:4px 0 22px 22px;margin-bottom:20px;
+    border-bottom:1px solid var(--hair);
+  }
+  .member:last-of-type{border-bottom:none}
+  .member::before{ /* member color spine */
+    content:"";position:absolute;left:0;top:6px;bottom:22px;width:3px;border-radius:3px;
+    background:var(--mc,#999);
+  }
+  .m-head{display:flex;align-items:baseline;gap:12px;margin-bottom:7px}
+  .m-name{
+    font-family:var(--serif);font-size:22px;font-weight:600;color:var(--ink);
+    letter-spacing:.01em;
+  }
+  .m-tag{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;
+    color:var(--ink-faint);text-transform:uppercase;
+  }
+  .m-body{font-size:15.5px;color:var(--ink);line-height:1.62;max-width:52ch}
+  .m-body .n{font-family:var(--mono);font-weight:600;color:var(--ink);font-size:.94em;letter-spacing:-.01em}
+
+  /* ---- moment of the month callout --------------------------- */
+  .member.moment{
+    background:linear-gradient(90deg, rgba(63,145,140,.07), transparent 80%);
+    border:1px solid rgba(63,145,140,.30);border-left:none;
+    border-radius:2px;padding:18px 20px 20px 22px;margin:26px 0;
+  }
+  .member.moment::before{top:18px;bottom:20px;left:0}
+  .moment-eyebrow{
+    font-family:var(--sans);font-size:10px;letter-spacing:.24em;text-transform:uppercase;
+    font-weight:700;color:var(--leo);margin-bottom:10px;display:flex;align-items:center;gap:9px;
+  }
+  .moment-eyebrow::before,.moment-eyebrow::after{content:"";height:1px;flex:0 0 18px;background:currentColor;opacity:.5}
+  .moment-eyebrow::after{flex:1}
+
+  /* ---- record book ledger ------------------------------------ */
+  .ledger{
+    margin:8px 40px 0;padding:20px 22px;border:1px solid var(--hair-strong);
+    border-radius:2px;background:rgba(34,31,25,.015);
+  }
+  .ledger-title{
+    font-family:var(--sans);font-size:10.5px;letter-spacing:.24em;text-transform:uppercase;
+    font-weight:700;color:var(--ink-soft);margin-bottom:14px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .ledger-title .chalk{font-family:var(--serif);font-style:italic;letter-spacing:normal;text-transform:none;font-size:12px;color:var(--ink-faint);font-weight:400}
+  .ledger-row{
+    display:flex;align-items:baseline;gap:12px;padding:7px 0;
+    border-top:1px dotted var(--hair-strong);font-size:13.5px;
+  }
+  .ledger-row:first-of-type{border-top:none}
+  .ledger-dot{flex:0 0 auto;width:7px;height:7px;border-radius:50%;background:var(--mc,#999);transform:translateY(-1px)}
+  .ledger-who{font-weight:600;min-width:38px}
+  .ledger-what{color:var(--ink-soft);flex:1}
+  .ledger-mark{font-family:var(--mono);font-size:12.5px;color:var(--ink);letter-spacing:-.01em}
+  .ledger-new{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);font-weight:700;border:1px solid rgba(176,116,42,.4);padding:1px 6px;border-radius:2px}
+
+  /* ---- forward hook ------------------------------------------ */
+  .hook{
+    margin:26px 40px 0;padding:22px 0 4px;border-top:2px solid var(--slate);
+    display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  }
+  .hook-label{font-family:var(--sans);font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--ink-soft);font-weight:700}
+  .hook-date{font-family:var(--serif);font-size:26px;color:var(--ink);font-weight:600}
+  .hook-sub{width:100%;font-size:13.5px;color:var(--ink-faint);font-style:italic;font-family:var(--serif);margin-top:2px}
+
+  /* ---- footer ------------------------------------------------ */
+  .foot{
+    padding:22px 40px 30px;text-align:center;
+  }
+  .foot .sig{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ink-soft)}
+  .disclaimer{
+    margin-top:26px;font-family:var(--mono);font-size:10px;line-height:1.7;
+    color:var(--ink-faint);letter-spacing:.02em;max-width:660px;margin-left:auto;margin-right:auto;
+    text-align:center;
+  }
+
+  @media (max-width:520px){
+    body{padding:16px 10px 40px}
+    .masthead,.hero,.letter,.ledger,.hook,.foot{padding-left:22px;padding-right:22px}
+    .ledger,.hook{margin-left:14px;margin-right:14px}
+    .hero{flex-direction:column;align-items:flex-start;gap:16px}
+  }
+
+  @media print{
+    body{background:#fff;padding:0}
+    .card{box-shadow:none;border:none;max-width:100%}
+    .masthead{background:var(--slate) !important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .pp-badge,.member.moment,.ledger,.pp-num,.pp-label{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .member,.member.moment,.ledger,.hook{break-inside:avoid}
+    .disclaimer{page-break-before:avoid}
+  }
+</style>
+</head>
+<body>
+  <main class="card" role="article" aria-label="October Trials Report for The Griffins">
+
+    <header class="masthead">
+      <p class="eyebrow">Family Record Book &middot; Monthly Trials</p>
+      <h1 class="family-name">The Griffins</h1>
+      <div class="trials-line">
+        <span class="month">October Trials</span>
+        <span class="dot">&middot;</span>
+        <span class="win">CHALKED OCT 24 &middot; 5 TESTS &middot; 2 SESSIONS</span>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="pp-badge">
+        <div class="pp-num">14</div>
+        <div class="pp-label">Progress<br>Points</div>
+      </div>
+      <p class="hero-copy">
+        Fourteen Progress Points &mdash; your <b>best month since June</b>.
+        This is what the record shows.
+      </p>
+    </section>
+
+    <section class="letter">
+
+      <!-- Sam -->
+      <div class="member" style="--mc:var(--sam)">
+        <div class="m-head"><span class="m-name">Sam</span><span class="m-tag">age 8</span></div>
+        <p class="m-body">
+          Sam took his squats from <span class="n">21</span> to <span class="n">27</span>.
+          <span class="n">Six</span> more than he'd ever done, and enough to move him out of Rookie into Trainee.
+          <span class="n">Twelve</span> push-ups too, past his old best of <span class="n">ten</span>.
+          The Record Book needed a fresh line in two places tonight.
+        </p>
+      </div>
+
+      <!-- Leo — Moment of the Month -->
+      <div class="member moment" style="--mc:var(--leo)">
+        <div class="moment-eyebrow">Moment of the Month</div>
+        <div class="m-head"><span class="m-name">Leo</span><span class="m-tag">age 10</span></div>
+        <p class="m-body">
+          Leo held a dead hang for <span class="n">twenty</span> seconds &mdash; his first ever at that mark,
+          up from <span class="n">fifteen</span> last month, and a Trainee bar cleared.
+          He did it with Ryan running the count and Sam calling the seconds out loud.
+          Earned in front of the two people watching closest, and logged by their own hands.
+        </p>
+      </div>
+
+      <!-- Ryan -->
+      <div class="member" style="--mc:var(--ryan)">
+        <div class="m-head"><span class="m-name">Ryan</span><span class="m-tag">age 14</span></div>
+        <p class="m-body">
+          Ryan's plank crossed the Skilled line at <span class="n">72</span> seconds, up from <span class="n">58</span>.
+          The standard is <span class="n">60</span> &mdash; a number that doesn't care how old you are &mdash;
+          and he's been circling it since spring. It's behind him now.
+        </p>
+      </div>
+
+      <!-- Dad -->
+      <div class="member" style="--mc:var(--dad)">
+        <div class="m-head"><span class="m-name">Dad</span><span class="m-tag">age 42</span></div>
+        <p class="m-body">
+          Dad matched his pull-up best, <span class="n">fifteen</span>, in a month that took him away on two work trips.
+          No new number on the board &mdash; but <span class="n">eleven</span> sessions and a lifetime best held on a hard month
+          is its own kind of record. Most men his age are giving reps back every year. He's keeping his.
+        </p>
+      </div>
+
+    </section>
+
+    <section class="ledger" aria-label="Record Book — new marks">
+      <div class="ledger-title">The Chalking <span class="chalk">&mdash; new marks, October</span></div>
+
+      <div class="ledger-row" style="--mc:var(--sam)">
+        <span class="ledger-dot"></span><span class="ledger-who">Sam</span>
+        <span class="ledger-what">Air Squats</span>
+        <span class="ledger-mark">27 &larr; 21</span><span class="ledger-new">Trainee</span>
+      </div>
+      <div class="ledger-row" style="--mc:var(--sam)">
+        <span class="ledger-dot"></span><span class="ledger-who">Sam</span>
+        <span class="ledger-what">Push-Ups</span>
+        <span class="ledger-mark">12 &larr; 10</span>
+      </div>
+      <div class="ledger-row" style="--mc:var(--leo)">
+        <span class="ledger-dot"></span><span class="ledger-who">Leo</span>
+        <span class="ledger-what">Dead Hang &middot; first 20-second hold</span>
+        <span class="ledger-mark">20s &larr; 15s</span><span class="ledger-new">Trainee</span>
+      </div>
+      <div class="ledger-row" style="--mc:var(--ryan)">
+        <span class="ledger-dot"></span><span class="ledger-who">Ryan</span>
+        <span class="ledger-what">Plank</span>
+        <span class="ledger-mark">72s &larr; 58s</span><span class="ledger-new">Skilled</span>
+      </div>
+    </section>
+
+    <section class="hook">
+      <span class="hook-label">Next Trials</span>
+      <span class="hook-date">November 8</span>
+      <span class="hook-sub">Everything above is now the number to beat.</span>
+    </section>
+
+    <footer class="foot">
+      <p class="sig">&mdash; the coach</p>
+    </footer>
+
+  </main>
+
+  <p class="disclaimer">
+    Illustrative output, generated by Claude Opus during exploration &middot; 2026-07-18 Fable night.<br>
+    Tier-2 prototype: engine facts &rarr; constrained generation &rarr; mechanical validation &rarr; keepsake.
+    Not a decision. Numbers are illustrative and internally consistent with facts-payload.json.
+  </p>
+</body>
+</html>
